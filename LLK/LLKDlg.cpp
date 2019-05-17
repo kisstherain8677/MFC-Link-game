@@ -8,6 +8,7 @@
 #include "Resource.h"
 #include "LLKDlg.h"
 #include "afxdialogex.h"
+#include "CGameDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -79,6 +80,7 @@ BEGIN_MESSAGE_MAP(CLLKDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON_BASIC, &CLLKDlg::OnClickedButtonBasic)
 END_MESSAGE_MAP()
 
 
@@ -177,3 +179,15 @@ HCURSOR CLLKDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CLLKDlg::OnClickedButtonBasic()
+{
+	//隐藏当前窗口
+	this->ShowWindow(SW_HIDE);
+	//创建游戏窗口并显示
+	CGameDlg dlg;
+	dlg.DoModal();
+	//显示当前窗口
+	this->ShowWindow(SW_SHOW);
+}

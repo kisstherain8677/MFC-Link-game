@@ -35,4 +35,6 @@ protected:
 
 	//初始化背景DC
 	void InitBackground();
+public:
+	afx_msg void OnClickedButtonBasic();
 };
