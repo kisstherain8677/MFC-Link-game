@@ -184,7 +184,7 @@ HCURSOR CLLKDlg::OnQueryDragIcon()
 void CLLKDlg::OnClickedButtonBasic()
 {
 	//隐藏当前窗口
-	this->ShowWindow(SW_HIDE);
+	//this->ShowWindow(SW_HIDE);
 	//创建游戏窗口并显示
 	CGameDlg dlg;
 	dlg.DoModal();
