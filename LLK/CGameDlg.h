@@ -1,5 +1,6 @@
 ﻿#pragma once
-
+#include"global.h"
+#include"CGameControl.h"
 
 // CGameDlg 对话框
 
@@ -22,13 +23,13 @@ protected:
 	CDC m_dcElement;//元素内存DC
 	CDC m_dcMask;//掩码内存DC
 	CDC m_dcBG;//背景DC
-	int m_anMap[4][4];//四行四列地图
 	CPoint m_ptGameTop;//元素初始位置
 	CSize m_sizeElement;//元素大小
 	bool m_bFirstPoint;//是否第一次选中
-	CPoint m_ptSelFirst;//第一次选中点
-	CPoint m_ptSelSec;//第二次选中的点
+	
 	CRect m_rtGameRect;//游戏区域大小
+
+	CGameControl m_gameControl;
 
 
 
@@ -38,8 +39,7 @@ protected:
 	void InitElement();
 	void UpdateMap();
 	void DrawTipFrame(int nRow, int nCol);//根据行号列号绘制矩形提示框
-	bool IsLink();//判断是否相同
-	void DrawTipLine();//绘制连接线
+	void DrawTipLine(Vertex asvPath[2]);//绘制连接线
 
 	DECLARE_MESSAGE_MAP()
 public:

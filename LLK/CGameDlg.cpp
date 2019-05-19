@@ -115,15 +115,12 @@ void CGameDlg::InitElement() {
 
 void CGameDlg::OnClickedButtonStart()
 {
-	int anMap[4][4] = { 0,1,2,1,0,2,1,1,2,3,2,0,3,1,2,0 };
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			m_anMap[i][j] = anMap[i][j];
-		}
-	}
-
+	//初始化地图
+	m_gameControl.StartGame();
+	//更新界面
 	UpdateMap();
-	Invalidate(FALSE);
+	//更新窗口
+	InvalidateRect(m_rtGameRect,FALSE);
 }
 
 void CGameDlg::UpdateMap() {
@@ -138,9 +135,9 @@ void CGameDlg::UpdateMap() {
 	
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
-			
-				m_dcMem.BitBlt(nX + j * nElemW, nY + i * nElemH, nElemW, nElemH, &m_dcMask, 0, m_anMap[i][j] * nElemH, SRCPAINT);
-				m_dcMem.BitBlt(nX + j * nElemW, nY + i * nElemH, nElemW, nElemH, &m_dcElement, 0, m_anMap[i][j] * nElemH, SRCAND);
+			int elem = m_gameControl.GetElement(i, j);
+				m_dcMem.BitBlt(nX + j * nElemW, nY + i * nElemH, nElemW, nElemH, &m_dcMask, 0,elem * nElemH, SRCPAINT);
+				m_dcMem.BitBlt(nX + j * nElemW, nY + i * nElemH, nElemW, nElemH, &m_dcElement, 0, elem * nElemH, SRCAND);
 
 		}
 	}
@@ -180,22 +177,24 @@ void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 	//如果是第一次选中，绘制矩形框
 	if (m_bFirstPoint) {
 		DrawTipFrame(nRow, nCol);
-		m_ptSelFirst.x = nCol;
-		m_ptSelFirst.y = nRow;
+		m_gameControl.SetFirstPoint(nRow, nCol);
 	}
 	else {
 		DrawTipFrame(nRow, nCol);
-		m_ptSelSec.x = nCol;
-		m_ptSelSec.y = nRow;
-		//判断是否是相同图片
-		if (IsLink()) {
-			DrawTipLine();//绘制连线
-			//消除
-			m_anMap[m_ptSelFirst.y][m_ptSelFirst.x] = -1;
-			m_anMap[m_ptSelSec.y][m_ptSelSec.x] = -1;
+		m_gameControl.SetSecPoint(nRow, nCol);
+		//消除
+		//获得路径
+		Vertex avPath[2];
+		//连子判断
+		if (m_gameControl.Link(avPath)) {
+			//画线
+			DrawTipLine(avPath);
+			
 			Sleep(200);
+			//更新地图
 			UpdateMap();
 		}
+		//判断是否是相同图片
 		
 		InvalidateRect(m_rtGameRect, FALSE);
 	}
@@ -203,14 +202,9 @@ void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 	
 }
 
-bool CGameDlg::IsLink() {
-	if (m_anMap[m_ptSelFirst.y][m_ptSelFirst.x]==m_anMap[m_ptSelSec.y][m_ptSelSec.x]) {//此处注意x y
-		return true;
-	}
-		return false;
-}
 
-void CGameDlg::DrawTipLine() {
+
+void CGameDlg::DrawTipLine(Vertex asvPath[2]) {
 	//获取DC
 	CClientDC dc(this);
 	//设置画笔
@@ -219,10 +213,10 @@ void CGameDlg::DrawTipLine() {
 	//将画笔送入DC
 	CPen* pOldPen = dc.SelectObject(&penLine);
 	//绘制连接线
-	dc.MoveTo(m_ptGameTop.x + m_ptSelFirst.x*m_sizeElement.cx + m_sizeElement.cx / 2,
-		m_ptGameTop.y + m_ptSelFirst.y*m_sizeElement.cy + m_sizeElement.cy / 2);
-	dc.LineTo(m_ptGameTop.x + m_ptSelSec.x*m_sizeElement.cx + m_sizeElement.cx / 2,
-		m_ptGameTop.y + m_ptSelSec.y*m_sizeElement.cy + m_sizeElement.cy / 2);
+	dc.MoveTo(m_ptGameTop.x + asvPath[0].col*m_sizeElement.cx + m_sizeElement.cx / 2,
+		m_ptGameTop.y + asvPath[0].row*m_sizeElement.cy + m_sizeElement.cy / 2);
+	dc.LineTo(m_ptGameTop.x + asvPath[1].col*m_sizeElement.cx + m_sizeElement.cx / 2,
+		m_ptGameTop.y + asvPath[1].row*m_sizeElement.cy + m_sizeElement.cy / 2);
 	
 	dc.SelectObject(pOldPen);
 
