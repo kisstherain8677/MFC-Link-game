@@ -39,7 +39,7 @@ protected:
 	void InitElement();
 	void UpdateMap();
 	void DrawTipFrame(int nRow, int nCol);//根据行号列号绘制矩形提示框
-	void DrawTipLine(Vertex asvPath[2]);//绘制连接线
+	void DrawTipLine(Vertex asvPath[4],int VexNum);//绘制连接线
 
 	DECLARE_MESSAGE_MAP()
 public:

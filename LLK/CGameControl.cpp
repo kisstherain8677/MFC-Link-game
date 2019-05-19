@@ -35,11 +35,12 @@ void CGameControl::SetSecPoint(int nRow, int nCol)
 	m_ptSelSec.row = nRow;
 }
 
-bool CGameControl::Link(Vertex avPath[2])
-{
+bool CGameControl::Link(Vertex avPath[4], int &nVertex)
+{   //判断是否为同一张图片
 	if (m_ptSelFirst.col == m_ptSelSec.col&&m_ptSelFirst.row == m_ptSelSec.row) {
 		return false;
 	}
+	//判断图片是否相同
 	if (m_anMap[m_ptSelFirst.row][m_ptSelFirst.col] != m_anMap[m_ptSelSec.row][m_ptSelSec.col]) {
 		return false;
 	}
@@ -49,9 +50,9 @@ bool CGameControl::Link(Vertex avPath[2])
 		return false;
 	}
 	gameLogic.Clear(m_anMap, m_ptSelFirst, m_ptSelSec);
-	//返回消除两个点的信息
-	avPath[0] = m_ptSelFirst;
-	avPath[1] = m_ptSelSec;
+	//获取路径，以及路径中顶点的个数
+	nVertex = gameLogic.GetVexPath(avPath);
+	return true;
 }
 
 

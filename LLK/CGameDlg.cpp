@@ -184,11 +184,12 @@ void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 		m_gameControl.SetSecPoint(nRow, nCol);
 		//消除
 		//获得路径
-		Vertex avPath[2];
+		Vertex avPath[4];
+		int VertexNum;
 		//连子判断
-		if (m_gameControl.Link(avPath)) {
+		if (m_gameControl.Link(avPath,VertexNum)) {
 			//画线
-			DrawTipLine(avPath);
+			DrawTipLine(avPath,VertexNum);
 			
 			Sleep(200);
 			//更新地图
@@ -204,7 +205,7 @@ void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 
 
 
-void CGameDlg::DrawTipLine(Vertex asvPath[2]) {
+void CGameDlg::DrawTipLine(Vertex asvPath[4],int nVexNum) {
 	//获取DC
 	CClientDC dc(this);
 	//设置画笔
@@ -212,12 +213,15 @@ void CGameDlg::DrawTipLine(Vertex asvPath[2]) {
 
 	//将画笔送入DC
 	CPen* pOldPen = dc.SelectObject(&penLine);
-	//绘制连接线
-	dc.MoveTo(m_ptGameTop.x + asvPath[0].col*m_sizeElement.cx + m_sizeElement.cx / 2,
-		m_ptGameTop.y + asvPath[0].row*m_sizeElement.cy + m_sizeElement.cy / 2);
-	dc.LineTo(m_ptGameTop.x + asvPath[1].col*m_sizeElement.cx + m_sizeElement.cx / 2,
-		m_ptGameTop.y + asvPath[1].row*m_sizeElement.cy + m_sizeElement.cy / 2);
 	
+	//根据栈中元素绘制连接线
+	for (int i = 0; i < nVexNum-1; i++) {
+		dc.MoveTo(m_ptGameTop.x + asvPath[i].col*m_sizeElement.cx + m_sizeElement.cx / 2,
+			m_ptGameTop.y + asvPath[i].row*m_sizeElement.cy + m_sizeElement.cy / 2);
+		dc.LineTo(m_ptGameTop.x + asvPath[i+1].col*m_sizeElement.cx + m_sizeElement.cx / 2,
+			m_ptGameTop.y + asvPath[i+1].row*m_sizeElement.cy + m_sizeElement.cy / 2);
+	}
+
 	dc.SelectObject(pOldPen);
 
 
