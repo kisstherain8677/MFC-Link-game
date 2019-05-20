@@ -13,72 +13,142 @@ CGameLogic::~CGameLogic()
 }
 
 //初始化游戏地图的二维数组
-void CGameLogic::InitMap(int anMap[][4])
+void CGameLogic::InitMap(CGraph &graph)
 {
+	
 	int anTemp[4][4] = { 0,1,2,1,0,2,1,1,2,3,2,0,3,1,2,0 };
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
-			anMap[i][j] = anTemp[i][j];
+			graph.AddVertex(anTemp[i][j]);
 		}
 	}
+	//更新图信息
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			UpdateArc(graph, i, j);
+		}
+	}
+
 }
 
 //判断两个图是否可以消除
-bool CGameLogic::IsLink(int anMap[][4], Vertex v1, Vertex v2)
+bool CGameLogic::IsLink(CGraph &g, Vertex v1, Vertex v2)
 {
-	//将第一个选中的点入栈
-	PushVertex(v1);
-	//X直连方式
-	if (v1.row == v2.row) {
-		if (LinkInRow(anMap, v1, v2)) {
-			PushVertex(v2);
-			return true;
-		}
-			
-	}
-
-	//Y直连方式
-	else if (v1.col == v2.col) {
-		if (LinkInCol(anMap, v1, v2)) {
-			PushVertex(v2);
-			return true;
-		}
-	}
-
-	//两条直线连通
-	if (OneCornorLink(anMap, v1, v2)) {
-		PushVertex(v2);
+	//获取顶点索引号
+	int nV1Index = v1.row * 4 + v1.col;
+	int nV2Index = v2.row * 4 + v2.col;
+	//压入第一个点
+	PushVertex(nV1Index);
+	//判断两顶点是否相邻连通
+	if (g.GetArc(nV1Index, nV2Index)) {
+		PushVertex(nV2Index);
 		return true;
 	}
-
-	//三条直线连通
-	if (TwoCornorLink(anMap, v1, v2)) {
-		PushVertex(v2);
+	if (SearchPathDFS(g, nV1Index, nV2Index)) {
+		PushVertex(nV2Index);
 		return true;
 	}
-	//不能消子，pop出第一个元素
-	PopVertex();
 	return false;
 }
 
-int CGameLogic::GetVexPath(Vertex avPath[4])
+int CGameLogic::GetVexPath(int avPath[])
 {
 	for (int i = 0; i < m_nVexNum; i++) {
-		avPath[i] = m_avPath[i];
+		avPath[i] = m_anPath[i];
 	}
 	return m_nVexNum;
 }
 
-void CGameLogic::Clear(int anMap[][4], Vertex v1, Vertex v2)
+void CGameLogic::Clear(CGraph &g, Vertex v1, Vertex v2)
 {
-	anMap[v1.row][v1.col] = BLANK;
-	anMap[v2.row][v2.col] = BLANK;
+	//获取顶点索引
+	int index1 = v1.row * 4 + v1.col;
+	int index2 = v2.row * 4 + v2.col;
+	//更新顶点
+	g.UpdateVertex(index1, BLANK);
+	g.UpdateVertex(index2, BLANK);
+	//更新边数组
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			UpdateArc(g, i, j);
+		}
+	}
+	
 }
 
-void CGameLogic::PushVertex(Vertex v)
+void CGameLogic::UpdateArc(CGraph & g, int nRow, int nCol)
 {
-	m_avPath[m_nVexNum] = v;
-	m_nVexNum++;
+	int nV1Index = nRow * 4 + nCol;
+	if (nCol > 0) {
+		int nV2Index = nV1Index - 1;
+		if (g.GetVertex(nV2Index) == g.GetVertex(nV1Index)||g.GetVertex(nV1Index)==BLANK||g.GetVertex(nV2Index)==BLANK) {
+			g.AddArc(nV1Index, nV2Index);
+		}
+	}
+	if (nCol < 3) {
+		int nV2Index = nV1Index + 1;
+		if (g.GetVertex(nV2Index) == g.GetVertex(nV1Index) || g.GetVertex(nV1Index) == BLANK || g.GetVertex(nV2Index) == BLANK) {
+			g.AddArc(nV1Index, nV2Index);
+		}
+	}
+	if (nRow > 0) {
+		int nV2Index = nV1Index - 4;
+		if (g.GetVertex(nV2Index) == g.GetVertex(nV1Index) || g.GetVertex(nV1Index) == BLANK || g.GetVertex(nV2Index) == BLANK) {
+			g.AddArc(nV1Index, nV2Index);
+		}
+	}
+	if (nRow < 3) {
+		int nV2Index = nV1Index + 4;
+		if (g.GetVertex(nV2Index) == g.GetVertex(nV1Index) || g.GetVertex(nV1Index) == BLANK || g.GetVertex(nV2Index) == BLANK) {
+			g.AddArc(nV1Index, nV2Index);
+		}
+	}
+}
+
+bool CGameLogic::SearchPathDFS(CGraph & g, int v0, int v1)
+{
+	//得到顶点数
+	int nVexnum = g.GetVexNum();
+	//遍历图中nV0行，从0到nVexnum列值为true的点
+	for (int vi = 0; vi < nVexnum; vi++) {
+		if (g.GetArc(v0, vi) && !isExsit(vi)) {
+			PushVertex(vi);
+
+			//当中间顶点不是v1时，继续搜索下一个相邻且连通的点
+			if (vi != v1) {
+				//当中间顶点不为空时，表示路径不连通
+				if (g.GetVertex(vi) != BLANK) {
+					PopVertex();
+					continue;
+				}
+				//如果vi是一个已消除的点，判断(vi v1)
+				if (SearchPathDFS(g, vi, v1)) {
+					return true;
+					//表示已经找到了一条连通路径，返回true
+				}
+			}
+			else {//如果vi=v1表示已经找到了一条连通路径，返回true
+				return true;
+			}
+			PopVertex();
+		}
+	}
+	return false;
+}
+
+bool CGameLogic::isExsit(int nVi)
+{
+	for (int i = 0; i < m_nVexNum; i++) {
+		if (m_anPath[i] == nVi) {
+			return true;
+		}
+	}
+	return false;
+}
+
+void CGameLogic::PushVertex(int nV )
+{
+	m_anPath[m_nVexNum++] = nV;
 }
 
 void CGameLogic::PopVertex()
@@ -88,40 +158,11 @@ void CGameLogic::PopVertex()
 
 bool CGameLogic::LinkInRow(int anMap[][4], Vertex v1, Vertex v2)
 {
-	int nCol1 = v1.col;
-	int nCol2 = v2.col;
-	int nRow = v1.row;
-	//保证nCol1<nCol2
-	if (nCol1 > nCol2) {
-		int temp = nCol1;
-		nCol1 = nCol2;
-		nCol2 = temp;
-	}
-
-	for (int i = nCol1 + 1; i <= nCol2; i++) {
-		if (i == nCol2) return true;
-		if (anMap[nRow][i] != BLANK) break;
-	}
 	return false;
 }
 
 bool CGameLogic::LinkInCol(int anMap[][4], Vertex v1, Vertex v2)
 {
-	int nRow1 = v1.row;
-	int nRow2 = v2.row;
-	int nCol = v1.col;
-
-	//保证nCol1<nCol2
-	if (nRow1 > nRow2) {
-		int temp = nRow1;
-		nRow1 = nRow2;
-		nRow2 = temp;
-	}
-
-	for (int i = nRow1 + 1; i <= nRow2; i++) {
-		if (i == nRow2) return true;
-		if (anMap[i][nCol] != BLANK) break;
-	}
 	return false;
 }
 
@@ -130,245 +171,23 @@ bool CGameLogic::LinkInCol(int anMap[][4], Vertex v1, Vertex v2)
 
 bool CGameLogic::OneCornorLink(int anMap[][4], Vertex v1, Vertex v2)
 {
-	int nRow1 = v1.row;
-	int nRow2 = v2.row;
-	int nCol1 = v1.col;
-	int nCol2 = v2.col;
-	Vertex coVertex;//拐点
-	//确保1<2
-	if (nRow1 > nRow2) {
-		int temp = nRow1;
-		nRow1 = nRow2;
-		nRow2 = temp;
-
-		int temp2 = nCol1;
-		nCol1 = nCol2;
-		nCol2 = temp2;
-	}
-	if (nCol2 < nCol1) {
-		if (LineX(anMap, nRow1, nCol2, nCol1 - 1) && LineY(anMap, nCol2, nRow1, nRow2 - 1))
-		{
-			
-			coVertex.col = nCol2;
-			coVertex.row = nRow1;
-			//拐点入栈
-			PushVertex(coVertex);
-			return true;
-		}
-		if (LineY(anMap, nCol1, nRow1+1, nRow2) && LineX(anMap, nRow2, nCol2+1, nCol1))
-		{
-
-			coVertex.col = nCol1;
-			coVertex.row = nRow2;
-			//拐点入栈
-			PushVertex(coVertex);
-			return true;
-		}
-	}
-	else {
-		if (LineX(anMap, nRow1, nCol1 + 1, nCol2) && LineY(anMap, nCol2, nRow1, nRow2 - 1))
-		{
-
-			coVertex.col = nCol2;
-			coVertex.row = nRow1;
-			//拐点入栈
-			PushVertex(coVertex);
-			return true;
-		}
-		if (LineY(anMap, nCol1, nRow1 + 1, nRow2) && LineX(anMap, nRow2, nCol1, nCol2 - 1))
-		{
-
-			coVertex.col = nCol1;
-			coVertex.row = nRow2;
-			//拐点入栈
-			PushVertex(coVertex);
-			return true;
-		}
-	}
-
 	return false;
 }
 
 bool CGameLogic::TwoCornorLink(int anMap[][4], Vertex v1, Vertex v2)
 {
-	int nRow1 = v1.row;
-	int nRow2 = v2.row;
-	int nCol1 = v1.col;
-	int nCol2 = v2.col;
-    //拐点
-	Vertex cov1;
-	Vertex cov2;
-
-	//确保1<2
-	if (nRow1 > nRow2) {
-		int temp = nRow1;
-		nRow1 = nRow2;
-		nRow2 = temp;
-
-		int temp2 = nCol1;
-		nCol1 = nCol2;
-		nCol2 = temp2;
-	}
-
-	if (nCol2 < nCol1) {
-		for (int rx = nRow1 + 1; rx <= nRow2 - 1; rx++) {
-			if (LineY(anMap, nCol1, nRow1 + 1, rx) && LineX(anMap, rx, nCol2, nCol1) && LineY(anMap, nCol2, rx, nRow2 - 1))
-			{
-				cov1.row = rx;
-				cov1.col = nCol1;
-
-				cov2.row = rx;
-				cov2.col = nCol2;
-				//两个拐点入栈
-				PushVertex(cov1);
-				PushVertex(cov2);
-				return true;
-			}
-		}
-
-		for (int cx = nCol2 + 1; cx <= nCol1 - 1; cx++) {
-			if (LineX(anMap, nRow2, nCol2 + 1, cx) && LineY(anMap, cx, nRow1, nRow2) && LineX(anMap, nRow1, cx, nCol1 - 1)) 
-			{
-				cov1.row = nRow1;
-				cov1.col = cx;
-
-				cov2.row = nRow2;
-				cov2.col = cx;
-				//两个拐点入栈
-				PushVertex(cov1);
-				PushVertex(cov2);
-				return true;
-			}
-			
-		}
-
-	}
-	else {
-		for (int rx = nRow1 + 1; rx <= nRow2 - 1; rx++) {
-			if (LineY(anMap, nCol1, nRow1 + 1, rx) && LineX(anMap, rx, nCol1, nCol2) && LineY(anMap, nCol2, rx, nRow2 - 1))
-			{
-				cov1.row = rx;
-				cov1.col = nCol1;
-
-				cov2.row = rx;
-				cov2.col = nCol2;
-				//两个拐点入栈
-				PushVertex(cov1);
-				PushVertex(cov2);
-				return true;
-			}
-		}
-		for (int cx = nCol1 + 1; cx <= nCol2 - 1; cx++) {
-			if (LineX(anMap, nRow1, nCol1 + 1, cx) && LineY(anMap, cx, nRow1, nRow2) && LineX(anMap, nRow2, cx, nCol2 - 1))
-			{
-				cov1.row = nRow1;
-				cov1.col = cx;
-
-				cov2.row = nRow2;
-				cov2.col = cx;
-				//两个拐点入栈
-				PushVertex(cov1);
-				PushVertex(cov2);
-				return true;
-			}
-		}
-
-	}
-
-	//row和col有一个相同的情况，即C形
-	//r1==r2
-	if (nRow1 == nRow2) {
-		for (int rx = 0; rx <= 3; rx++) {
-			if (rx == nRow1)
-				continue;
-			else {
-				if (rx < nRow1) {//rx在两点下面
-					if (LineY(anMap, nCol1, nRow1 + 1, rx) && LineX(anMap, rx, nCol1, nCol2) && LineY(anMap, nCol2, nRow1 + 1, rx))
-					{
-						cov1.row = rx;
-						cov1.col = nCol1;
-
-						cov2.row = rx;
-						cov2.col = nCol2;
-						//两个拐点入栈
-						PushVertex(cov1);
-						PushVertex(cov2);
-						return true;
-					}
-				}
-				else {//rx在两点上面
-					if (LineY(anMap, nCol1, rx, nRow1 - 1) && LineX(anMap, rx, nCol1, nCol2) && LineY(anMap, nCol2, rx, nRow1 - 1))
-					{
-						cov1.row = rx;
-						cov1.col = nCol1;
-
-						cov2.row = rx;
-						cov2.col = nCol2;
-						//两个拐点入栈
-						PushVertex(cov1);
-						PushVertex(cov2);
-						return true;
-					}
-				}
-			}
-		}
-	}
-
-	if (nCol1 == nCol2) {
-		for (int cx = 0; cx <= 3; cx++) {
-			if (cx == nCol1)
-				continue;
-			else {
-				if (cx < nCol1) {//cx在两点左边
-					if (LineX(anMap, nRow1, cx, nCol1 - 1) && LineY(anMap, cx, nRow1, nRow2) && LineX(anMap, nRow2, cx, nCol2 - 1))
-					{
-						cov1.row = nRow1;
-						cov1.col = cx;
-
-						cov2.row = nRow2;
-						cov2.col = cx;
-						//两个拐点入栈
-						PushVertex(cov1);
-						PushVertex(cov2);
-						return true;
-					}
-				}
-				else {//cx在两点右边
-					if (LineX(anMap, nRow1, nCol1 + 1, cx) && LineY(anMap, cx, nRow1, nRow2) && LineX(anMap, nRow2, nCol2 + 1, cx))
-					{
-						cov1.row = nRow1;
-						cov1.col = cx;
-
-						cov2.row = nRow2;
-						cov2.col = cx;
-						//两个拐点入栈
-						PushVertex(cov1);
-						PushVertex(cov2);
-						return true;
-					}
-				}
-			}
-		}
-	}
 	
-
 
 	return false;
 }
 
 bool CGameLogic::LineX(int anMap[][4], int nRow, int nCol1, int nCol2)
 {
-	for (int nCol = nCol1; nCol <= nCol2; nCol++) {
-		if (anMap[nRow][nCol] != BLANK)
-			return false;
-	}
+	
 	return true;
 }
 
 bool CGameLogic::LineY(int anMap[][4], int nCol, int nRow1, int nRow2) {
-	for (int nRow = nRow1; nRow <= nRow2; nRow++) {
-		if (anMap[nRow][nCol] != BLANK)
-			return false;
-	}
+	
 	return true;
 }

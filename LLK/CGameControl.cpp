@@ -15,12 +15,12 @@ CGameControl::~CGameControl()
 void CGameControl::StartGame()
 {
 	CGameLogic gameLogic;
-	gameLogic.InitMap(m_anMap);
+	gameLogic.InitMap(m_graph);
 }
 
 int CGameControl::GetElement(int nRow, int nCol)
 {
-	return m_anMap[nRow][nCol];
+	return m_graph.GetVertex(nRow*4+nCol);
 }
 
 void CGameControl::SetFirstPoint(int nRow, int nCol)
@@ -35,21 +35,23 @@ void CGameControl::SetSecPoint(int nRow, int nCol)
 	m_ptSelSec.row = nRow;
 }
 
-bool CGameControl::Link(Vertex avPath[4], int &nVertex)
-{   //判断是否为同一张图片
+bool CGameControl::Link(int avPath[16], int &nVertex)
+{   //判断是否为同一位置
 	if (m_ptSelFirst.col == m_ptSelSec.col&&m_ptSelFirst.row == m_ptSelSec.row) {
 		return false;
 	}
 	//判断图片是否相同
-	if (m_anMap[m_ptSelFirst.row][m_ptSelFirst.col] != m_anMap[m_ptSelSec.row][m_ptSelSec.col]) {
+	int index1 = 4 * m_ptSelFirst.row + m_ptSelFirst.col;
+	int index2 = 4 * m_ptSelSec.row + m_ptSelSec.col;
+	if (m_graph.GetVertex(index1) != m_graph.GetVertex(index2)) {
 		return false;
 	}
 	CGameLogic gameLogic;
 	
-	if (!gameLogic.IsLink(m_anMap, m_ptSelFirst, m_ptSelSec)){
+	if (!gameLogic.IsLink(m_graph, m_ptSelFirst, m_ptSelSec)){
 		return false;
 	}
-	gameLogic.Clear(m_anMap, m_ptSelFirst, m_ptSelSec);
+	gameLogic.Clear(m_graph, m_ptSelFirst, m_ptSelSec);
 	//获取路径，以及路径中顶点的个数
 	nVertex = gameLogic.GetVexPath(avPath);
 	return true;
