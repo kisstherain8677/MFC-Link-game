@@ -5,6 +5,7 @@
 CGameLogic::CGameLogic()
 {
 	m_nVexNum = 0;
+	m_nCorner = 0;
 }
 
 
@@ -45,9 +46,9 @@ bool CGameLogic::IsLink(CGraph &g, Vertex v1, Vertex v2)
 		return true;
 	}
 	if (SearchPathDFS(g, nV1Index, nV2Index)) {
-		PushVertex(nV2Index);
 		return true;
 	}
+	//PopVertex();
 	return false;
 }
 
@@ -113,6 +114,10 @@ bool CGameLogic::SearchPathDFS(CGraph & g, int v0, int v1)
 	for (int vi = 0; vi < nVexnum; vi++) {
 		if (g.GetArc(v0, vi) && !isExsit(vi)) {
 			PushVertex(vi);
+			if (m_nCorner > 2) {
+				PopVertex();
+				continue;
+			}
 
 			//当中间顶点不是v1时，继续搜索下一个相邻且连通的点
 			if (vi != v1) {
@@ -146,13 +151,30 @@ bool CGameLogic::isExsit(int nVi)
 	return false;
 }
 
+bool CGameLogic::IsCorner()
+{
+	if (m_nVexNum >= 3) {
+		if ((m_anPath[m_nVexNum - 1] + m_anPath[m_nVexNum - 3]) / 2 != m_anPath[m_nVexNum - 2]) {
+			
+			return true;
+		}
+	}
+	return false;
+}
+
 void CGameLogic::PushVertex(int nV )
 {
 	m_anPath[m_nVexNum++] = nV;
+	if (IsCorner()) {
+		m_nCorner++;
+	}
 }
 
 void CGameLogic::PopVertex()
 {
+	if (IsCorner()) {
+		m_nCorner--;
+	}
 	m_nVexNum--;
 }
 

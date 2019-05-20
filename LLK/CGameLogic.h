@@ -28,7 +28,7 @@ protected:
 
 	//深度优先搜索，判断顶点V0，V1在图中是否连通
 	bool SearchPathDFS(CGraph &g, int v0,int v1);
-	//判断索引为nVi的顶点是否保存到连通数组m_anPath中
+	//判断索引为nVi的顶点是否保存到连通数组m_anPath中 
 	bool isExsit(int nVi);
 	//判断连接路径数组m_anPath中，连续三个顶点是否构成一个拐点
 	bool IsCorner();
