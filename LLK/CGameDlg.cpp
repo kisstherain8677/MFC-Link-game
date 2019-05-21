@@ -67,6 +67,7 @@ BEGIN_MESSAGE_MAP(CGameDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_START, &CGameDlg::OnClickedButtonStart)
 //	ON_WM_LBUTTONUP()
 ON_WM_LBUTTONUP()
+ON_BN_CLICKED(IDC_BUTTON_HINT, &CGameDlg::OnClickedButtonHint)
 END_MESSAGE_MAP()
 
 
@@ -142,8 +143,14 @@ void CGameDlg::UpdateMap() {
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			int elem = m_gameControl.GetElement(i, j);
-				m_dcMem.BitBlt(nX + j * nElemW, nY + i * nElemH, nElemW, nElemH, &m_dcMask, 0,elem * nElemH, SRCPAINT);
-				m_dcMem.BitBlt(nX + j * nElemW, nY + i * nElemH, nElemW, nElemH, &m_dcElement, 0, elem * nElemH, SRCAND);
+			//去背景
+			
+			m_dcMem.BitBlt(nX + j * nElemW, nY + i * nElemH, nElemW, nElemH, &m_dcMask, 0,elem * nElemH, SRCPAINT);
+			m_dcMem.BitBlt(nX + j * nElemW, nY + i * nElemH, nElemW, nElemH, &m_dcElement, 0, elem * nElemH, SRCAND);
+			
+			//不去背景
+			//m_dcMem.BitBlt(nX + j * nElemW, nY + i * nElemH, nElemW, nElemH, &m_dcElement, 0, elem * nElemH, SRCCOPY);
+				
 
 		}
 	}
@@ -245,4 +252,22 @@ void CGameDlg::DrawTipLine(int asvPath[16],int nVexNum) {
 	dc.SelectObject(pOldPen);
 
 
+}
+
+
+void CGameDlg::OnClickedButtonHint()
+{
+	int avPath[MAX_VERTEX_NUM];
+	int vertexNum;
+	if (m_gameControl.Help(avPath, vertexNum)) {
+		int row1 = avPath[0] / 4;
+		int col1 = avPath[0] % 4;
+		int row2 = avPath[vertexNum - 1] / 4;
+		int col2 = avPath[vertexNum - 1] % 4;
+		DrawTipFrame(row1, col1);
+		DrawTipFrame(row2, col2);
+		DrawTipLine(avPath, vertexNum);
+		Sleep(1000);
+		UpdateMap();
+	}
 }

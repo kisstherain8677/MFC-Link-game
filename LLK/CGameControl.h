@@ -14,6 +14,7 @@ public:
 	void SetSecPoint(int nRow, int nCol);//设置第二个点的行列号
 	bool Link(int avPath[16],int &nVertex);//判断是否可连通，如果能连通，通过参数返回连接路径和连接
 	bool isWin();//判断图中顶点是否为空，如果为空，清理图结构，返回true
+	bool Help(int avPath[16], int &nVexNum);
 protected:
 	CGraph m_graph;//用一个图结构保存地图
 	Vertex m_ptSelFirst;//第一次选中点

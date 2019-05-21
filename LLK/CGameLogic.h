@@ -15,7 +15,9 @@ public:
 	int GetVexPath(int avPath[]);//得到路径axPath，并通过参数返回给调用函数，返回值为顶点数
 	void Clear(CGraph &g, Vertex v1, Vertex v2);
 	bool isBlank(CGraph &g);//判断g中顶点是否都为空
-	
+	bool SearchValidPath(CGraph &g);
+	int GetPathNum();
+	int GetPathIn(int index);//返回path中索引为index的值，超出个数返回-1
 
 protected:
 

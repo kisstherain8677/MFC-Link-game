@@ -67,4 +67,20 @@ bool CGameControl::isWin()
 	return false;
 }
 
+bool CGameControl::Help(int avPath[16], int & nVexNum)
+{
+	CGameLogic logic;
+	if (logic.isBlank(m_graph)) {
+		return false;
+	}
+	if (logic.SearchValidPath(m_graph)) {
+		for (int i = 0; i < logic.GetPathNum(); i++) {
+			avPath[i] = logic.GetPathIn(i);
+		}
+		nVexNum = logic.GetPathNum();
+		return true;
+	}
+	return false;
+}
+
 

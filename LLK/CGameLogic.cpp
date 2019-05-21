@@ -87,6 +87,46 @@ bool CGameLogic::isBlank(CGraph & g)
 	return true;
 }
 
+bool CGameLogic::SearchValidPath(CGraph & g)
+{
+	//找到第一个不为空的点V1
+	int index1;
+	int index2;
+	for (int i = 0; i < g.GetVexNum(); i++) {
+		if (g.GetVertex(i) != BLANK) {
+			index1 = i;
+			for (int j = 0; j < g.GetVexNum(); j++) {
+				if (i != j) {
+					if (g.GetVertex(index1) == g.GetVertex(j)) {
+						PushVertex(index1);
+						if (SearchPathDFS(g, index1, j)) {
+							return true;
+						}
+						PopVertex();
+					}
+
+				}
+			}
+		}
+		
+	}
+
+	return false;
+}
+
+int CGameLogic::GetPathNum()
+{
+	return m_nVexNum;
+}
+
+int CGameLogic::GetPathIn(int index)
+{
+	if (index < m_nVexNum) {
+		return m_anPath[index];
+	}
+	return -1;
+}
+
 void CGameLogic::UpdateArc(CGraph & g, int nRow, int nCol)
 {
 	int nV1Index = nRow * 4 + nCol;
