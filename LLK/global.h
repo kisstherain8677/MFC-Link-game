@@ -17,3 +17,8 @@ typedef struct  tagVertex
 #define MAP_LEFT 20
 #define PIC_WIDTH 40
 #define PIC_HEIGHT 40
+#define PLAY_TIMER_ID 1
+#define GAME_LOSE -2
+#define GAME_SUCCESS 0
+#define GAME_PLAY 2
+

@@ -15,6 +15,7 @@ CGameDlg::CGameDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_GAME_DIALOG, pParent)
 {
 	m_bPlaying = false;
+	m_bPause = false;
 	//初始化游戏更新区域
 	
 
@@ -37,6 +38,7 @@ CGameDlg::~CGameDlg()
 void CGameDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_GAME_TIME, m_GameProgress);
 }
 
 void CGameDlg::InitBackground()
@@ -69,6 +71,8 @@ BEGIN_MESSAGE_MAP(CGameDlg, CDialogEx)
 ON_WM_LBUTTONUP()
 ON_BN_CLICKED(IDC_BUTTON_HINT, &CGameDlg::OnClickedButtonHint)
 ON_BN_CLICKED(IDC_BUTTON_RESET, &CGameDlg::OnClickedButtonReset)
+ON_WM_TIMER()
+ON_BN_CLICKED(IDC_BUTTON_PAUSE, &CGameDlg::OnClickedButtonPause)
 END_MESSAGE_MAP()
 
 
@@ -99,6 +103,35 @@ void CGameDlg::OnPaint()
 
 }
 
+void CGameDlg::DrawGameTime()
+{
+
+}
+
+void CGameDlg::JudgeWin()
+{
+	int bGameStatus = m_gameControl.isWin(m_GameProgress.GetPos());
+
+	if (bGameStatus == GAME_PLAY) {
+		return;
+	}
+	else {
+		m_bPlaying = false;
+		KillTimer(PLAY_TIMER_ID);
+
+		CString strTitle;
+		this->GetWindowTextW(strTitle);
+		if (bGameStatus == GAME_SUCCESS) {
+			MessageBox(_T("WIN!!"));
+		}
+		else if (bGameStatus == GAME_LOSE) {
+			MessageBox(_T("SORRY,YOU LOSE.."));
+		}
+		//还原开始游戏按钮
+		this->GetDlgItem(IDC_BUTTON_START)->EnableWindow(TRUE);
+	}
+}
+
 //将元素图片载入内存
 void CGameDlg::InitElement() {
 	CClientDC dc(this);
@@ -125,6 +158,16 @@ void CGameDlg::OnClickedButtonStart()
 	m_bPlaying = true;
 	//禁用开始游戏按键
 	this->GetDlgItem(IDC_BUTTON_START)->EnableWindow(FALSE);
+	
+	//初始进度条
+	m_GameProgress.SetRange(0, 300);//范围
+	m_GameProgress.SetStep(-2);//步长
+	m_GameProgress.SetPos(60 * 5);//初始值
+	//启动定时器
+	this->SetTimer(PLAY_TIMER_ID, 1000, NULL);//为NULL代表调用默认的回调函数OnTimer
+
+
+
 	//更新界面
 	UpdateMap();
 	//更新窗口
@@ -219,13 +262,7 @@ void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 		
 		InvalidateRect(m_rtGameRect, FALSE);
 		//判断是否胜利
-		if (m_bPlaying &&m_gameControl.isWin()) {
-			MessageBox(_T("YOU WIN!"));
-			m_bPlaying = false;
-			//解除禁用开始游戏按键
-			this->GetDlgItem(IDC_BUTTON_START)->EnableWindow(TRUE);
-			return;
-		}
+		JudgeWin();
 	}
 	m_bFirstPoint = !m_bFirstPoint;
 	
@@ -278,4 +315,34 @@ void CGameDlg::OnClickedButtonReset()
 {
 	m_gameControl.ResetGraph();
 	UpdateMap();
+}
+
+
+void CGameDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	if (nIDEvent == PLAY_TIMER_ID&&m_bPause==false) {
+		//游戏时间减一秒
+		//StepIt根据增量重绘
+		m_GameProgress.StepIt();
+	}
+	JudgeWin();
+	CDialogEx::OnTimer(nIDEvent);
+}
+
+
+void CGameDlg::OnClickedButtonPause()
+{
+	if (!m_bPlaying) {
+		return;
+	}
+	if (m_bPause == false) {
+		this->GetDlgItem(IDC_BUTTON_PAUSE)->SetWindowTextW(_T("继续"));
+		m_bPause = true;
+		return;
+	}
+	if (m_bPause == true) {
+		this->GetDlgItem(IDC_BUTTON_PAUSE)->SetWindowTextW(_T("暂停"));
+		m_bPause = false;
+		return;
+	}
 }

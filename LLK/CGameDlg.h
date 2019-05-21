@@ -30,7 +30,7 @@ protected:
 	CRect m_rtGameRect;//游戏区域大小
 	CGameControl m_gameControl;
 	bool m_bPlaying;//true表示游戏正在进行
-
+	bool m_bPause;
 
 
 
@@ -45,10 +45,16 @@ protected:
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
-
-	
 	afx_msg void OnClickedButtonStart();
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnClickedButtonHint();
 	afx_msg void OnClickedButtonReset();
+	CProgressCtrl m_GameProgress;
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+
+	void DrawGameTime();
+	void JudgeWin();
+
+	
+	afx_msg void OnClickedButtonPause();
 };

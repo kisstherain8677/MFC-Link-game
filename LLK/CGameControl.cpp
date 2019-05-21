@@ -57,14 +57,18 @@ bool CGameControl::Link(int avPath[MAX_VERTEX_NUM], int &nVertex)
 	return true;
 }
 
-bool CGameControl::isWin()
+int CGameControl::isWin(int nTime)
 {
 	CGameLogic gameLogic;
+	if (nTime <= 0) {
+		m_graph.ClearGraph();
+		return GAME_LOSE;
+	}
 	if (gameLogic.isBlank(m_graph)) {
 		m_graph.ClearGraph();
-		return true;
+		return GAME_SUCCESS;
 	}
-	return false;
+	return GAME_PLAY;
 }
 
 bool CGameControl::Help(int avPath[MAX_VERTEX_NUM], int & nVexNum)
