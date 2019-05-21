@@ -28,8 +28,8 @@ protected:
 	bool m_bFirstPoint;//是否第一次选中
 	
 	CRect m_rtGameRect;//游戏区域大小
-
 	CGameControl m_gameControl;
+	bool m_bPlaying;//true表示游戏正在进行
 
 
 
@@ -48,6 +48,5 @@ public:
 
 	
 	afx_msg void OnClickedButtonStart();
-//	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 };

@@ -57,4 +57,14 @@ bool CGameControl::Link(int avPath[16], int &nVertex)
 	return true;
 }
 
+bool CGameControl::isWin()
+{
+	CGameLogic gameLogic;
+	if (gameLogic.isBlank(m_graph)) {
+		m_graph.ClearGraph();
+		return true;
+	}
+	return false;
+}
+
 

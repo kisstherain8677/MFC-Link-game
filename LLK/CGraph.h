@@ -12,6 +12,7 @@ public:
 	int GetArcNum();//获取边数
 	void UpdateVertex(int nIndex, int info);//将图中索引号为nIndex的元素更新为info
 	bool GetArc(int v1, int v2);//根据索引返回边
+	void ClearGraph();//将图中顶点和边还原为初始状态
 
 protected:
 #define MAX_VERTEX_NUM 16

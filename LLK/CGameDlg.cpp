@@ -14,6 +14,7 @@ IMPLEMENT_DYNAMIC(CGameDlg, CDialogEx)
 CGameDlg::CGameDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_GAME_DIALOG, pParent)
 {
+	m_bPlaying = false;
 	//初始化游戏更新区域
 	
 
@@ -115,8 +116,13 @@ void CGameDlg::InitElement() {
 
 void CGameDlg::OnClickedButtonStart()
 {
+
 	//初始化地图
 	m_gameControl.StartGame();
+
+	m_bPlaying = true;
+	//禁用开始游戏按键
+	this->GetDlgItem(IDC_BUTTON_START)->EnableWindow(FALSE);
 	//更新界面
 	UpdateMap();
 	//更新窗口
@@ -164,6 +170,12 @@ void CGameDlg::DrawTipFrame(int nRow,int nCol) {
 
 void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 {
+	
+	if (m_bPlaying == false) {
+		return;
+	}
+	
+	
 	if (point.x < m_ptGameTop.x || point.y < m_ptGameTop.y) {
 		return CDialogEx::OnLButtonUp(nFlags, point);
 	}
@@ -198,6 +210,14 @@ void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 		//判断是否是相同图片
 		
 		InvalidateRect(m_rtGameRect, FALSE);
+		//判断是否胜利
+		if (m_bPlaying &&m_gameControl.isWin()) {
+			MessageBox(_T("YOU WIN!"));
+			m_bPlaying = false;
+			//解除禁用开始游戏按键
+			this->GetDlgItem(IDC_BUTTON_START)->EnableWindow(TRUE);
+			return;
+		}
 	}
 	m_bFirstPoint = !m_bFirstPoint;
 	

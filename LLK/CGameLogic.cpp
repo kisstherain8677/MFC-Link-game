@@ -17,7 +17,7 @@ CGameLogic::~CGameLogic()
 void CGameLogic::InitMap(CGraph &graph)
 {
 	
-	int anTemp[4][4] = { 0,1,2,1,0,2,1,1,2,3,2,0,3,1,2,0 };
+	int anTemp[4][4] = { 0,1,2,1,0,2,1,1,2,3,2,0,3,1,0,1 };
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
 			graph.AddVertex(anTemp[i][j]);
@@ -75,6 +75,16 @@ void CGameLogic::Clear(CGraph &g, Vertex v1, Vertex v2)
 		}
 	}
 	
+}
+
+bool CGameLogic::isBlank(CGraph & g)
+{
+	int vn = g.GetVexNum();
+	for (int i = 0; i < vn; i++) {
+		if (g.GetVertex(i) != BLANK)
+			return false;
+	}
+	return true;
 }
 
 void CGameLogic::UpdateArc(CGraph & g, int nRow, int nCol)
@@ -178,38 +188,3 @@ void CGameLogic::PopVertex()
 	m_nVexNum--;
 }
 
-bool CGameLogic::LinkInRow(int anMap[][4], Vertex v1, Vertex v2)
-{
-	return false;
-}
-
-bool CGameLogic::LinkInCol(int anMap[][4], Vertex v1, Vertex v2)
-{
-	return false;
-}
-
-
-
-
-bool CGameLogic::OneCornorLink(int anMap[][4], Vertex v1, Vertex v2)
-{
-	return false;
-}
-
-bool CGameLogic::TwoCornorLink(int anMap[][4], Vertex v1, Vertex v2)
-{
-	
-
-	return false;
-}
-
-bool CGameLogic::LineX(int anMap[][4], int nRow, int nCol1, int nCol2)
-{
-	
-	return true;
-}
-
-bool CGameLogic::LineY(int anMap[][4], int nCol, int nRow1, int nRow2) {
-	
-	return true;
-}

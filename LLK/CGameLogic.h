@@ -14,7 +14,7 @@ public:
 
 	int GetVexPath(int avPath[]);//得到路径axPath，并通过参数返回给调用函数，返回值为顶点数
 	void Clear(CGraph &g, Vertex v1, Vertex v2);
-	
+	bool isBlank(CGraph &g);//判断g中顶点是否都为空
 	
 
 protected:
@@ -42,13 +42,6 @@ protected:
 
 	
 
-	//IsLink的辅助函数
-	bool LinkInRow(int anMap[][4], Vertex v1, Vertex v2);//横向连通判断
-	bool LinkInCol(int anMap[][4], Vertex v1, Vertex v2);//纵向连通判断
-	bool OneCornorLink(int anMap[][4], Vertex v1, Vertex v2);//一个拐点连通判断
-	bool TwoCornorLink(int anMap[][4], Vertex v1, Vertex v2);//两个拐点连通判断
-	bool LineY(int anMap[][4], int nRow1, int nRow2, int nCol);//直线连通Y轴
-	bool LineX(int anMap[][4], int nRow, int nCol1, int nCol2);//直线连通X轴
-
+	
 };
 

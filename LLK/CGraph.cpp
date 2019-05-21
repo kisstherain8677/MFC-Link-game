@@ -52,6 +52,11 @@ bool CGraph::GetArc(int v1, int v2)
 	return m_AdjMatrix[v1][v2];
 }
 
+void CGraph::ClearGraph()
+{
+	InitGraph();
+}
+
 void CGraph::InitGraph()
 {
 	m_VexNum = 0;
