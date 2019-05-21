@@ -20,7 +20,7 @@ void CGameControl::StartGame()
 
 int CGameControl::GetElement(int nRow, int nCol)
 {
-	return m_graph.GetVertex(nRow*4+nCol);
+	return m_graph.GetVertex(nRow*MAX_COL+nCol);
 }
 
 void CGameControl::SetFirstPoint(int nRow, int nCol)
@@ -35,14 +35,14 @@ void CGameControl::SetSecPoint(int nRow, int nCol)
 	m_ptSelSec.row = nRow;
 }
 
-bool CGameControl::Link(int avPath[16], int &nVertex)
+bool CGameControl::Link(int avPath[MAX_VERTEX_NUM], int &nVertex)
 {   //判断是否为同一位置
 	if (m_ptSelFirst.col == m_ptSelSec.col&&m_ptSelFirst.row == m_ptSelSec.row) {
 		return false;
 	}
 	//判断图片是否相同
-	int index1 = 4 * m_ptSelFirst.row + m_ptSelFirst.col;
-	int index2 = 4 * m_ptSelSec.row + m_ptSelSec.col;
+	int index1 = MAX_COL * m_ptSelFirst.row + m_ptSelFirst.col;
+	int index2 = MAX_COL * m_ptSelSec.row + m_ptSelSec.col;
 	if (m_graph.GetVertex(index1) != m_graph.GetVertex(index2)) {
 		return false;
 	}
@@ -67,7 +67,7 @@ bool CGameControl::isWin()
 	return false;
 }
 
-bool CGameControl::Help(int avPath[16], int & nVexNum)
+bool CGameControl::Help(int avPath[MAX_VERTEX_NUM], int & nVexNum)
 {
 	CGameLogic logic;
 	if (logic.isBlank(m_graph)) {
@@ -81,6 +81,12 @@ bool CGameControl::Help(int avPath[16], int & nVexNum)
 		return true;
 	}
 	return false;
+}
+
+void CGameControl::ResetGraph()
+{
+	CGameLogic logic;
+	logic.ResetGraph(m_graph);
 }
 
 

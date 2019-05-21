@@ -18,11 +18,11 @@ public:
 	bool SearchValidPath(CGraph &g);
 	int GetPathNum();
 	int GetPathIn(int index);//返回path中索引为index的值，超出个数返回-1
-
+	void ResetGraph(CGraph &g);
 protected:
 
 	//保存连通路径的顶点索引
-	int m_anPath[16];
+	int m_anPath[MAX_VERTEX_NUM];
 	//连通路径顶点个数
 	int m_nVexNum;
 	//连通路径数组m_anPath中的拐点数

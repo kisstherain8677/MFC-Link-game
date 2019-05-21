@@ -18,16 +18,16 @@ CGameDlg::CGameDlg(CWnd* pParent /*=nullptr*/)
 	//初始化游戏更新区域
 	
 
-	m_ptGameTop.x = 50;
-	m_ptGameTop.y = 50;
-	m_sizeElement.cx = 40;
-	m_sizeElement.cy = 40;
+	m_ptGameTop.x = MAP_LEFT;
+	m_ptGameTop.y = MAP_TOP;
+	m_sizeElement.cx = PIC_WIDTH;
+	m_sizeElement.cy = PIC_HEIGHT;
 	m_bFirstPoint = true;
 
 	m_rtGameRect.top = m_ptGameTop.y;
 	m_rtGameRect.left = m_ptGameTop.x;
-	m_rtGameRect.right = m_rtGameRect.left + m_sizeElement.cx * 4;
-	m_rtGameRect.bottom = m_rtGameRect.top + m_sizeElement.cy * 4;
+	m_rtGameRect.right = m_rtGameRect.left + m_sizeElement.cx * MAX_COL;
+	m_rtGameRect.bottom = m_rtGameRect.top + m_sizeElement.cy * MAX_ROW;
 }
 
 CGameDlg::~CGameDlg()
@@ -68,6 +68,7 @@ BEGIN_MESSAGE_MAP(CGameDlg, CDialogEx)
 //	ON_WM_LBUTTONUP()
 ON_WM_LBUTTONUP()
 ON_BN_CLICKED(IDC_BUTTON_HINT, &CGameDlg::OnClickedButtonHint)
+ON_BN_CLICKED(IDC_BUTTON_RESET, &CGameDlg::OnClickedButtonReset)
 END_MESSAGE_MAP()
 
 
@@ -131,17 +132,17 @@ void CGameDlg::OnClickedButtonStart()
 }
 
 void CGameDlg::UpdateMap() {
-	int nX = 50;
-	int nY = 50;
-	int nElemW = 40;
-	int nElemH = 40;
+	int nX = MAP_LEFT;
+	int nY = MAP_TOP;
+	int nElemW = PIC_WIDTH;
+	int nElemH = PIC_HEIGHT;
 	
 	m_dcMem.BitBlt(m_rtGameRect.left, m_rtGameRect.top,
 		m_rtGameRect.Width(), m_rtGameRect.Height(), &m_dcBG, m_rtGameRect.left, m_rtGameRect.top, SRCCOPY);
 
 	
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
+	for (int i = 0; i < MAX_ROW; i++) {
+		for (int j = 0; j < MAX_COL; j++) {
 			int elem = m_gameControl.GetElement(i, j);
 			//去背景
 			
@@ -189,7 +190,7 @@ void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 
 	int nRow = (point.y - m_ptGameTop.y) / m_sizeElement.cy;
 	int nCol = (point.x - m_ptGameTop.x) / m_sizeElement.cx;
-	if (nRow > 3 || nCol > 3) {
+	if (nRow > MAX_ROW-1 || nCol > MAX_COL-1) {
 		return CDialogEx::OnLButtonUp(nFlags, point);
 	}
 
@@ -203,7 +204,7 @@ void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 		m_gameControl.SetSecPoint(nRow, nCol);
 		//消除
 		//获得路径
-		int avPath[16];
+		int avPath[MAX_VERTEX_NUM];
 		int VertexNum;
 		//连子判断
 		if (m_gameControl.Link(avPath,VertexNum)) {
@@ -232,7 +233,7 @@ void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 
 
 
-void CGameDlg::DrawTipLine(int asvPath[16],int nVexNum) {
+void CGameDlg::DrawTipLine(int asvPath[MAX_VERTEX_NUM],int nVexNum) {
 	//获取DC
 	CClientDC dc(this);
 	//设置画笔
@@ -243,10 +244,10 @@ void CGameDlg::DrawTipLine(int asvPath[16],int nVexNum) {
 	
 	//根据栈中元素绘制连接线
 	for (int i = 0; i < nVexNum-1; i++) {
-		dc.MoveTo(m_ptGameTop.x + asvPath[i]%4*m_sizeElement.cx + m_sizeElement.cx / 2,
-			m_ptGameTop.y + asvPath[i]/4*m_sizeElement.cy + m_sizeElement.cy / 2);
-		dc.LineTo(m_ptGameTop.x + asvPath[i+1]%4*m_sizeElement.cx + m_sizeElement.cx / 2,
-			m_ptGameTop.y + asvPath[i+1]/4*m_sizeElement.cy + m_sizeElement.cy / 2);
+		dc.MoveTo(m_ptGameTop.x + asvPath[i]%MAX_COL*m_sizeElement.cx + m_sizeElement.cx / 2,
+			m_ptGameTop.y + asvPath[i]/MAX_COL*m_sizeElement.cy + m_sizeElement.cy / 2);
+		dc.LineTo(m_ptGameTop.x + asvPath[i+1]%MAX_COL*m_sizeElement.cx + m_sizeElement.cx / 2,
+			m_ptGameTop.y + asvPath[i+1]/MAX_COL*m_sizeElement.cy + m_sizeElement.cy / 2);
 	}
 
 	dc.SelectObject(pOldPen);
@@ -260,14 +261,21 @@ void CGameDlg::OnClickedButtonHint()
 	int avPath[MAX_VERTEX_NUM];
 	int vertexNum;
 	if (m_gameControl.Help(avPath, vertexNum)) {
-		int row1 = avPath[0] / 4;
-		int col1 = avPath[0] % 4;
-		int row2 = avPath[vertexNum - 1] / 4;
-		int col2 = avPath[vertexNum - 1] % 4;
+		int row1 = avPath[0] / MAX_COL;
+		int col1 = avPath[0] % MAX_COL;
+		int row2 = avPath[vertexNum - 1] / MAX_COL;
+		int col2 = avPath[vertexNum - 1] % MAX_COL;
 		DrawTipFrame(row1, col1);
 		DrawTipFrame(row2, col2);
 		DrawTipLine(avPath, vertexNum);
 		Sleep(1000);
 		UpdateMap();
 	}
+}
+
+
+void CGameDlg::OnClickedButtonReset()
+{
+	m_gameControl.ResetGraph();
+	UpdateMap();
 }

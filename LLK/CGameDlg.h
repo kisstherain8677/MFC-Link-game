@@ -39,7 +39,7 @@ protected:
 	void InitElement();
 	void UpdateMap();
 	void DrawTipFrame(int nRow, int nCol);//根据行号列号绘制矩形提示框
-	void DrawTipLine(int asvPath[16],int VexNum);//绘制连接线
+	void DrawTipLine(int asvPath[MAX_VERTEX_NUM],int VexNum);//绘制连接线
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -50,4 +50,5 @@ public:
 	afx_msg void OnClickedButtonStart();
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnClickedButtonHint();
+	afx_msg void OnClickedButtonReset();
 };

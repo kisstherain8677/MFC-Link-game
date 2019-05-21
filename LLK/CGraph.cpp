@@ -57,6 +57,11 @@ void CGraph::ClearGraph()
 	InitGraph();
 }
 
+void CGraph::SetVertex(int index, int val)
+{
+	m_Vertices[index] = val;
+}
+
 void CGraph::InitGraph()
 {
 	m_VexNum = 0;

@@ -1,4 +1,5 @@
 #pragma once
+#include "global.h"
 class CGraph
 {
 public:
@@ -13,9 +14,9 @@ public:
 	void UpdateVertex(int nIndex, int info);//将图中索引号为nIndex的元素更新为info
 	bool GetArc(int v1, int v2);//根据索引返回边
 	void ClearGraph();//将图中顶点和边还原为初始状态
-
+	void SetVertex(int index, int val);
 protected:
-#define MAX_VERTEX_NUM 16
+
 typedef int Vertices[MAX_VERTEX_NUM];
 typedef bool AdjMatrix[MAX_VERTEX_NUM][MAX_VERTEX_NUM];
 

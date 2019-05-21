@@ -16,16 +16,39 @@ CGameLogic::~CGameLogic()
 //初始化游戏地图的二维数组
 void CGameLogic::InitMap(CGraph &graph)
 {
-	
-	int anTemp[4][4] = { 0,1,2,1,0,2,1,1,2,3,2,0,3,1,0,1 };
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			graph.AddVertex(anTemp[i][j]);
+
+
+	//随机生成地图
+	int anTemp[MAX_VERTEX_NUM];
+	//多少花色
+	for (int i = 0; i < MAX_PIC_NUM; i++) {
+		//重复数
+		for (int j = 0; j < REPEAT_NUM; j++) {
+			anTemp[i*REPEAT_NUM + j] = i;
 		}
 	}
+	//设置种子
+	srand((int)time(NULL));
+
+	//随机任意交换两个数
+	for (int i = 0; i < MAX_VERTEX_NUM; i++) {
+		//随机得到两个坐标
+		int nIndex1 = rand() % MAX_VERTEX_NUM;
+		int nIndex2 = rand() % MAX_VERTEX_NUM;
+		//交换两个数值
+		int temp = anTemp[nIndex1];
+		anTemp[nIndex1] = anTemp[nIndex2];
+		anTemp[nIndex2] = temp;
+	}
+
+	for (int i = 0; i < MAX_VERTEX_NUM; i++) {
+		
+			graph.AddVertex(anTemp[i]);
+		
+	}
 	//更新图信息
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
+	for (int i = 0; i < MAX_ROW; i++) {
+		for (int j = 0; j < MAX_COL; j++) {
 			UpdateArc(graph, i, j);
 		}
 	}
@@ -36,8 +59,8 @@ void CGameLogic::InitMap(CGraph &graph)
 bool CGameLogic::IsLink(CGraph &g, Vertex v1, Vertex v2)
 {
 	//获取顶点索引号
-	int nV1Index = v1.row * 4 + v1.col;
-	int nV2Index = v2.row * 4 + v2.col;
+	int nV1Index = v1.row * MAX_COL + v1.col;
+	int nV2Index = v2.row * MAX_COL + v2.col;
 	//压入第一个点
 	PushVertex(nV1Index);
 	//判断两顶点是否相邻连通
@@ -63,14 +86,14 @@ int CGameLogic::GetVexPath(int avPath[])
 void CGameLogic::Clear(CGraph &g, Vertex v1, Vertex v2)
 {
 	//获取顶点索引
-	int index1 = v1.row * 4 + v1.col;
-	int index2 = v2.row * 4 + v2.col;
+	int index1 = v1.row * MAX_COL + v1.col;
+	int index2 = v2.row * MAX_COL + v2.col;
 	//更新顶点
 	g.UpdateVertex(index1, BLANK);
 	g.UpdateVertex(index2, BLANK);
 	//更新边数组
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
+	for (int i = 0; i < MAX_ROW; i++) {
+		for (int j = 0; j < MAX_COL; j++) {
 			UpdateArc(g, i, j);
 		}
 	}
@@ -127,29 +150,46 @@ int CGameLogic::GetPathIn(int index)
 	return -1;
 }
 
+void CGameLogic::ResetGraph(CGraph & g)
+{
+	for (int i = 0; i < 100; i++) {
+		int index1 = rand() % MAX_VERTEX_NUM;
+		int index2 = rand() % MAX_VERTEX_NUM;
+		int temp = g.GetVertex(index1);
+		g.SetVertex(index1, g.GetVertex(index2));
+		g.SetVertex(index2, temp);
+	}
+	//更新图信息（边的关系）
+	for (int i = 0; i < MAX_ROW; i++) {
+		for (int j = 0; j < MAX_COL; j++) {
+			UpdateArc(g, i, j);
+		}
+	}
+}
+
 void CGameLogic::UpdateArc(CGraph & g, int nRow, int nCol)
 {
-	int nV1Index = nRow * 4 + nCol;
+	int nV1Index = nRow * MAX_COL + nCol;
 	if (nCol > 0) {
 		int nV2Index = nV1Index - 1;
 		if (g.GetVertex(nV2Index) == g.GetVertex(nV1Index)||g.GetVertex(nV1Index)==BLANK||g.GetVertex(nV2Index)==BLANK) {
 			g.AddArc(nV1Index, nV2Index);
 		}
 	}
-	if (nCol < 3) {
+	if (nCol < MAX_COL-1) {
 		int nV2Index = nV1Index + 1;
 		if (g.GetVertex(nV2Index) == g.GetVertex(nV1Index) || g.GetVertex(nV1Index) == BLANK || g.GetVertex(nV2Index) == BLANK) {
 			g.AddArc(nV1Index, nV2Index);
 		}
 	}
 	if (nRow > 0) {
-		int nV2Index = nV1Index - 4;
+		int nV2Index = nV1Index - MAX_COL;
 		if (g.GetVertex(nV2Index) == g.GetVertex(nV1Index) || g.GetVertex(nV1Index) == BLANK || g.GetVertex(nV2Index) == BLANK) {
 			g.AddArc(nV1Index, nV2Index);
 		}
 	}
-	if (nRow < 3) {
-		int nV2Index = nV1Index + 4;
+	if (nRow < MAX_ROW-1) {
+		int nV2Index = nV1Index + MAX_COL;
 		if (g.GetVertex(nV2Index) == g.GetVertex(nV1Index) || g.GetVertex(nV1Index) == BLANK || g.GetVertex(nV2Index) == BLANK) {
 			g.AddArc(nV1Index, nV2Index);
 		}
