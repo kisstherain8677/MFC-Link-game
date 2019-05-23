@@ -8,15 +8,15 @@ typedef struct  tagVertex
 }Vertex;
 
 #define BLANK -1
-#define MAX_VERTEX_NUM 160
-#define MAX_ROW 10
-#define MAX_COL 16
+#define MAX_VERTEX_NUM 96
+#define MAX_ROW 8
+#define MAX_COL 12
 #define MAX_PIC_NUM 16
-#define REPEAT_NUM 10
+#define REPEAT_NUM 6
 #define MAP_TOP 50
-#define MAP_LEFT 20
-#define PIC_WIDTH 40
-#define PIC_HEIGHT 40
+#define MAP_LEFT 50
+#define PIC_WIDTH 70
+#define PIC_HEIGHT 70
 #define PLAY_TIMER_ID 1
 #define GAME_LOSE -2
 #define GAME_SUCCESS 0

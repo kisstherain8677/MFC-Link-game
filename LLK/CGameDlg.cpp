@@ -58,10 +58,10 @@ void CGameDlg::InitBackground()
 	//初始化内存DC
 	m_dcMem.CreateCompatibleDC(&dc);
 	CBitmap bmpMem;
-	bmpMem.CreateCompatibleBitmap(&dc, 800, 600);
+	bmpMem.CreateCompatibleBitmap(&dc, 1366, 768);
 	m_dcMem.SelectObject(&bmpMem);
 	//绘制背景到内存DC。
-	m_dcMem.BitBlt(0, 0, 800, 600, &m_dcBG, 0, 0, SRCCOPY);
+	m_dcMem.BitBlt(0, 0, 1366, 768, &m_dcBG, 0, 0, SRCCOPY);
 }
 
 
@@ -70,8 +70,8 @@ BEGIN_MESSAGE_MAP(CGameDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_START, &CGameDlg::OnClickedButtonStart)
 //	ON_WM_LBUTTONUP()
 ON_WM_LBUTTONUP()
-ON_BN_CLICKED(IDC_BUTTON_HINT, &CGameDlg::OnClickedButtonHint)
 ON_BN_CLICKED(IDC_BUTTON_RESET, &CGameDlg::OnClickedButtonReset)
+ON_BN_CLICKED(IDC_BUTTON_HINT, &CGameDlg::OnClickedButtonHint)
 ON_WM_TIMER()
 ON_BN_CLICKED(IDC_BUTTON_PAUSE, &CGameDlg::OnClickedButtonPause)
 ON_BN_CLICKED(IDC_BUTTON_HELP, &CGameDlg::OnBnClickedButtonHelp)
@@ -101,7 +101,7 @@ void CGameDlg::OnPaint()
 	CPaintDC dc(this); // device context for painting
 					   // TODO: 在此处添加消息处理程序代码
 					   // 不为绘图消息调用 CDialogEx::OnPaint()
-	dc.BitBlt(0, 0, 800, 600, &m_dcMem, 0, 0, SRCCOPY);
+	dc.BitBlt(0, 0, 1366, 768, &m_dcMem, 0, 0, SRCCOPY);
 
 }
 
@@ -313,11 +313,7 @@ void CGameDlg::OnClickedButtonHint()
 }
 
 
-void CGameDlg::OnClickedButtonReset()
-{
-	m_gameControl.ResetGraph();
-	UpdateMap();
-}
+
 
 
 void CGameDlg::OnTimer(UINT_PTR nIDEvent)
@@ -354,4 +350,10 @@ void CGameDlg::OnBnClickedButtonHelp()
 {
 	CHelpDialog dlg;
 	dlg.DoModal();
+}
+
+void CGameDlg::OnClickedButtonReset()
+{
+	m_gameControl.ResetGraph();
+	UpdateMap();
 }
