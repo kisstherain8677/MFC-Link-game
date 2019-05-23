@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "LLK.h"
 #include "CGameDlg.h"
+#include"CHelpDialog.h"
 #include "afxdialogex.h"
 
 
@@ -48,7 +49,7 @@ void CGameDlg::InitBackground()
 	CClientDC dc(this);
     
 	//加载bmp图片资源
-	HANDLE bmp = ::LoadImage(NULL, _T("theme\\picture\\basic_bg.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);;
+	HANDLE bmp = ::LoadImage(NULL, _T("theme\\picture\\basic_bg.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 	//创建与视频内存兼容的内存DC
 	m_dcBG.CreateCompatibleDC(&dc);
 	//将位图资源选入DC
@@ -73,6 +74,7 @@ ON_BN_CLICKED(IDC_BUTTON_HINT, &CGameDlg::OnClickedButtonHint)
 ON_BN_CLICKED(IDC_BUTTON_RESET, &CGameDlg::OnClickedButtonReset)
 ON_WM_TIMER()
 ON_BN_CLICKED(IDC_BUTTON_PAUSE, &CGameDlg::OnClickedButtonPause)
+ON_BN_CLICKED(IDC_BUTTON_HELP, &CGameDlg::OnBnClickedButtonHelp)
 END_MESSAGE_MAP()
 
 
@@ -345,4 +347,11 @@ void CGameDlg::OnClickedButtonPause()
 		m_bPause = false;
 		return;
 	}
+}
+
+
+void CGameDlg::OnBnClickedButtonHelp()
+{
+	CHelpDialog dlg;
+	dlg.DoModal();
 }

@@ -57,4 +57,5 @@ public:
 
 	
 	afx_msg void OnClickedButtonPause();
+	afx_msg void OnBnClickedButtonHelp();
 };

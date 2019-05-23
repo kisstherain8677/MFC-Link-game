@@ -187,6 +187,7 @@
     <ClInclude Include="CGameDlg.h" />
     <ClInclude Include="CGameLogic.h" />
     <ClInclude Include="CGraph.h" />
+    <ClInclude Include="CHelpDialog.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="LLK.h" />
     <ClInclude Include="LLKDlg.h" />
@@ -199,6 +200,7 @@
     <ClCompile Include="CGameDlg.cpp" />
     <ClCompile Include="CGameLogic.cpp" />
     <ClCompile Include="CGraph.cpp" />
+    <ClCompile Include="CHelpDialog.cpp" />
     <ClCompile Include="LLK.cpp" />
     <ClCompile Include="LLKDlg.cpp" />
     <ClCompile Include="stdafx.cpp">

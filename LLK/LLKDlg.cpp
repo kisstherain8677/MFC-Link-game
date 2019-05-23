@@ -9,6 +9,7 @@
 #include "LLKDlg.h"
 #include "afxdialogex.h"
 #include "CGameDlg.h"
+#include"CHelpDialog.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -81,6 +82,7 @@ BEGIN_MESSAGE_MAP(CLLKDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON_BASIC, &CLLKDlg::OnClickedButtonBasic)
+	ON_BN_CLICKED(IDC_BUTTON_HELP, &CLLKDlg::OnBnClickedButtonHelp)
 END_MESSAGE_MAP()
 
 
@@ -190,4 +192,11 @@ void CLLKDlg::OnClickedButtonBasic()
 	dlg.DoModal();
 	//显示当前窗口
 	this->ShowWindow(SW_SHOW);
+}
+
+
+void CLLKDlg::OnBnClickedButtonHelp()
+{
+	CHelpDialog dlg;
+	dlg.DoModal();
 }
