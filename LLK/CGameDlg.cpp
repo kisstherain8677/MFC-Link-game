@@ -227,6 +227,9 @@ void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 	if (m_bPlaying == false) {
 		return;
 	}
+	if (m_bPause == true) {
+		return;
+	}
 	
 	
 	if (point.x < m_ptGameTop.x || point.y < m_ptGameTop.y) {

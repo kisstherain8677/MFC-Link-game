@@ -93,4 +93,21 @@ void CGameControl::ResetGraph()
 	logic.ResetGraph(m_graph);
 }
 
+void CGameControl::SetFlag(Flag flag)
+{
+	m_flag.bProp = flag.bProp;
+	m_flag.bScore = flag.bScore;
+	m_flag.bTimer = flag.bTimer;
+	m_flag.szTitle = flag.szTitle;
+}
+
+Flag CGameControl::GetFlag()
+{
+	bool bProp = m_flag.bProp;
+	bool bScore = m_flag.bScore;
+	bool bTimer = m_flag.bTimer;
+	CString title = m_flag.szTitle;
+	return Flag{ bTimer, bProp, bScore, title };
+}
+
 

@@ -16,9 +16,12 @@ public:
 	int isWin(int time);//判断图中顶点是否为空，如果为空，清理图结构，返回true
 	bool Help(int avPath[MAX_VERTEX_NUM], int &nVexNum);
 	void ResetGraph();
+	void SetFlag(Flag flag);
+	Flag GetFlag();
 protected:
 	CGraph m_graph;//用一个图结构保存地图
 	Vertex m_ptSelFirst;//第一次选中点
 	Vertex m_ptSelSec;//第二次选中的点
+	Flag m_flag;
 };
 
