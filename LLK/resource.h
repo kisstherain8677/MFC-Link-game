@@ -26,6 +26,12 @@
 #define IDC_STATIC_HELP                 1016
 #define IDC_SCROLLBAR1                  1017
 #define IDC_SCROLLBAR_HELP              1017
+#define IDC_BUTTON_TOOL                 1018
+#define IDC_STATIC_SCORE                1019
+#define IDC_STATIC_TOOLN2               1021
+#define IDC_STATIC_TOOL                 1022
+#define IDC_STATIC_SCORE_TEXT           1023
+#define IDC_STATIC_TOOL_TEXT            1024
 
 // Next default values for new objects
 // 
@@ -33,7 +39,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        140
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1018
+#define _APS_NEXT_CONTROL_VALUE         1025
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

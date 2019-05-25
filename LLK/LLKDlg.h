@@ -38,4 +38,5 @@ protected:
 public:
 	afx_msg void OnClickedButtonBasic();
 	afx_msg void OnBnClickedButtonHelp();
+	afx_msg void OnBnClickedButtonRelax();
 };

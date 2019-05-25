@@ -83,6 +83,7 @@ BEGIN_MESSAGE_MAP(CLLKDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON_BASIC, &CLLKDlg::OnClickedButtonBasic)
 	ON_BN_CLICKED(IDC_BUTTON_HELP, &CLLKDlg::OnBnClickedButtonHelp)
+	ON_BN_CLICKED(IDC_BUTTON_RELAX, &CLLKDlg::OnBnClickedButtonRelax)
 END_MESSAGE_MAP()
 
 
@@ -189,6 +190,11 @@ void CLLKDlg::OnClickedButtonBasic()
 	//this->ShowWindow(SW_HIDE);
 	//创建游戏窗口并显示
 	CGameDlg dlg;
+	CBasicGame* basicControl = new CBasicGame();
+	Flag flag{true,false,false,_T("基本模式")};
+	basicControl->SetFlag(flag);
+	//设置gameDlg的游戏模式，给予对应的Control
+	dlg.SetGameModel(basicControl);
 	dlg.DoModal();
 	//显示当前窗口
 	this->ShowWindow(SW_SHOW);
@@ -199,4 +205,18 @@ void CLLKDlg::OnBnClickedButtonHelp()
 {
 	CHelpDialog dlg;
 	dlg.DoModal();
+}
+
+
+void CLLKDlg::OnBnClickedButtonRelax()
+{
+	CGameDlg dlg;
+	CEasyGame* easyControl = new CEasyGame();
+	Flag flag{ false,true,true,_T("休闲模式") };
+	easyControl->SetFlag(flag);
+	//设置gameDlg的游戏模式，给予对应的Control
+	dlg.SetGameModel(easyControl);
+	dlg.DoModal();
+	//显示当前窗口
+	this->ShowWindow(SW_SHOW);
 }

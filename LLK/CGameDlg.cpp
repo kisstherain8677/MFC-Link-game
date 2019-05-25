@@ -17,6 +17,7 @@ CGameDlg::CGameDlg(CWnd* pParent /*=nullptr*/)
 {
 	m_bPlaying = false;
 	m_bPause = false;
+	m_bProp = false;
 	//初始化游戏更新区域
 	
 
@@ -75,6 +76,7 @@ ON_BN_CLICKED(IDC_BUTTON_HINT, &CGameDlg::OnClickedButtonHint)
 ON_WM_TIMER()
 ON_BN_CLICKED(IDC_BUTTON_PAUSE, &CGameDlg::OnClickedButtonPause)
 ON_BN_CLICKED(IDC_BUTTON_HELP, &CGameDlg::OnBnClickedButtonHelp)
+ON_BN_CLICKED(IDC_BUTTON_TOOL, &CGameDlg::OnBnClickedButtonTool)
 END_MESSAGE_MAP()
 
 
@@ -91,10 +93,79 @@ BOOL CGameDlg::OnInitDialog()
 	//载入元素图片到内存
 	InitElement();
 
+	this->GetDlgItem(IDC_BUTTON_HELP)->EnableWindow(TRUE);
+	m_flag = m_pGameControl->GetFlag();
+	if (m_flag.bProp == false) {
+		this->GetDlgItem(IDC_BUTTON_TOOL)->ShowWindow(SW_HIDE);
+	}
+	if (m_flag.bTimer == false) {
+		this->GetDlgItem(IDC_GAME_TIME)->ShowWindow(SW_HIDE);
+	}
+
+	if (m_flag.bTimer == true) {
+		this->GetDlgItem(IDC_STATIC_SCORE_TEXT)->ShowWindow(SW_HIDE);
+		this->GetDlgItem(IDC_STATIC_SCORE)->ShowWindow(SW_HIDE);
+		this->GetDlgItem(IDC_STATIC_TOOL)->ShowWindow(SW_HIDE);
+		this->GetDlgItem(IDC_STATIC_TOOL_TEXT)->ShowWindow(SW_HIDE);
+	}
+
+	if (m_flag.bScore == false) {
+		this->GetDlgItem(IDC_STATIC_SCORE)->ShowWindow(SW_HIDE);
+	}
+	if (m_flag.bScore == true) {
+		DrawGrade();
+		this->GetDlgItem(IDC_BUTTON_RESET)->EnableWindow(FALSE);
+		this->GetDlgItem(IDC_BUTTON_HINT)->EnableWindow(FALSE);
+		this->GetDlgItem(IDC_BUTTON_HELP)->EnableWindow(FALSE);
+		this->GetDlgItem(IDC_BUTTON_TOOL)->EnableWindow(FALSE);
+
+	}
+	
+
+	this->SetWindowTextW(m_flag.szTitle);
+
+	//m_pGameControl 
+
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // 异常: OCX 属性页应返回 FALSE
 }
 
+void CGameDlg::DrawGrade() {
+		int i = this->GetGameControl()->GetGrade();
+		CString str;
+		str.Format(_T("%d"), i);
+		this->GetDlgItem(IDC_STATIC_SCORE)->SetWindowTextW(str);
+}
+
+void CGameDlg::DrawTool() {
+	int i = this->m_nProp;
+	CString str;
+	str.Format(_T("%d"), i);
+	this->GetDlgItem(IDC_STATIC_TOOL)->SetWindowTextW(str);
+}
+
+void CGameDlg::CaculateGrade()//大于20分可用提示，大于50分可用重排，每达到100分增加一个道具，使用一次扣除相应分数
+{
+	int i = this->GetGameControl()->GetGrade();
+	if (i >= 20) {
+		this->GetDlgItem(IDC_BUTTON_HINT)->EnableWindow(TRUE);
+	}
+	if (i < 20) {
+		this->GetDlgItem(IDC_BUTTON_HINT)->EnableWindow(FALSE);
+	}
+	if (i >= 50) {
+		this->GetDlgItem(IDC_BUTTON_RESET)->EnableWindow(TRUE);
+	}
+	if (i < 50) {
+		this->GetDlgItem(IDC_BUTTON_RESET)->EnableWindow(FALSE);
+	}
+	if (i >= 100&&this->m_nProp>=1) {
+		this->GetDlgItem(IDC_BUTTON_TOOL)->EnableWindow(TRUE);
+	}
+	if (i < 100||this->m_nProp<1) {
+		this->GetDlgItem(IDC_BUTTON_TOOL)->EnableWindow(FALSE);
+	}
+}
 
 void CGameDlg::OnPaint()
 {
@@ -112,7 +183,7 @@ void CGameDlg::DrawGameTime()
 
 void CGameDlg::JudgeWin()
 {
-	int bGameStatus = m_gameControl.isWin(m_GameProgress.GetPos());
+	int bGameStatus = m_pGameControl->isWin(m_GameProgress.GetPos());
 
 	if (bGameStatus == GAME_PLAY) {
 		return;
@@ -155,7 +226,7 @@ void CGameDlg::OnClickedButtonStart()
 {
 
 	//初始化地图
-	m_gameControl.StartGame();
+	m_pGameControl->StartGame();
 
 	m_bPlaying = true;
 	//禁用开始游戏按键
@@ -188,7 +259,7 @@ void CGameDlg::UpdateMap() {
 	
 	for (int i = 0; i < MAX_ROW; i++) {
 		for (int j = 0; j < MAX_COL; j++) {
-			int elem = m_gameControl.GetElement(i, j);
+			int elem = m_pGameControl->GetElement(i, j);
 			//去背景
 			
 			m_dcMem.BitBlt(nX + j * nElemW, nY + i * nElemH, nElemW, nElemH, &m_dcMask, 0,elem * nElemH, SRCPAINT);
@@ -232,6 +303,7 @@ void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 	}
 	
 	
+	
 	if (point.x < m_ptGameTop.x || point.y < m_ptGameTop.y) {
 		return CDialogEx::OnLButtonUp(nFlags, point);
 	}
@@ -245,23 +317,47 @@ void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 	//如果是第一次选中，绘制矩形框
 	if (m_bFirstPoint) {
 		DrawTipFrame(nRow, nCol);
-		m_gameControl.SetFirstPoint(nRow, nCol);
+		m_pGameControl->SetFirstPoint(nRow, nCol);
 	}
 	else {
 		DrawTipFrame(nRow, nCol);
-		m_gameControl.SetSecPoint(nRow, nCol);
+		m_pGameControl->SetSecPoint(nRow, nCol);
 		//消除
 		//获得路径
 		int avPath[MAX_VERTEX_NUM];
 		int VertexNum;
 		//连子判断
-		if (m_gameControl.Link(avPath,VertexNum)) {
+		if (m_bProp) {//如果使用道具，调用直接消除方法
+			m_pGameControl->PropLink();
+			//加10分
+			int grade = m_pGameControl->GetGrade();
+			grade += 10;
+			m_pGameControl->SetGrade(grade);
+			m_bProp = false;
+			CaculateGrade();
+			DrawGrade();
+			DrawTool();
+			UpdateMap();
+			InvalidateRect(m_rtGameRect, FALSE);
+			return;
+		}
+		if (m_pGameControl->Link(avPath,VertexNum)) {
 			//画线
 			DrawTipLine(avPath,VertexNum);
 			
 			Sleep(200);
 			//更新地图
 			UpdateMap();
+			//加分
+			int grade = m_pGameControl->GetGrade();
+			grade += 10;
+			m_pGameControl->SetGrade(grade);
+			if (grade % 100 == 0) {
+				this->m_nProp++;
+			}
+			this->CaculateGrade();
+			DrawGrade();
+			DrawTool();
 		}
 		//判断是否是相同图片
 		
@@ -302,7 +398,7 @@ void CGameDlg::OnClickedButtonHint()
 {
 	int avPath[MAX_VERTEX_NUM];
 	int vertexNum;
-	if (m_gameControl.Help(avPath, vertexNum)) {
+	if (m_pGameControl->Help(avPath, vertexNum)) {
 		int row1 = avPath[0] / MAX_COL;
 		int col1 = avPath[0] % MAX_COL;
 		int row2 = avPath[vertexNum - 1] / MAX_COL;
@@ -313,6 +409,12 @@ void CGameDlg::OnClickedButtonHint()
 		Sleep(1000);
 		UpdateMap();
 	}
+	//使用提示减20
+	int grade = GetGameControl()->GetGrade();
+	grade -= 20;
+	GetGameControl()->SetGrade(grade);
+	CaculateGrade();
+	DrawGrade();
 }
 
 
@@ -355,8 +457,33 @@ void CGameDlg::OnBnClickedButtonHelp()
 	dlg.DoModal();
 }
 
+Flag CGameDlg::GetFlag()
+{
+	return m_flag;
+}
+
+void CGameDlg::SetFlag(Flag flag)
+{
+	m_flag = flag;
+}
+
 void CGameDlg::OnClickedButtonReset()
 {
-	m_gameControl.ResetGraph();
+	m_pGameControl->ResetGraph();
 	UpdateMap();
+	//使用重排减50
+	int grade = GetGameControl()->GetGrade();
+	grade -= 50;
+	GetGameControl()->SetGrade(grade);
+	CaculateGrade();
+	DrawGrade();
+}
+
+void CGameDlg::OnBnClickedButtonTool()
+{
+	
+	MessageBox(_T("正在使用道具！可以任意消除两个噢"));
+	m_bProp = true;
+	m_nProp--;
+	
 }
