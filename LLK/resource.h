@@ -12,6 +12,8 @@
 #define IDD_GAME_DIALOG                 134
 #define IDD__DIALOG_HELP                138
 #define IDR_ACCELERATOR1                141
+#define IDB_BITMAP2                     143
+#define IDB_BITMAP3                     144
 #define IDC_BUTTON_BASIC                1000
 #define IDC_BUTTON_LEVEL                1002
 #define IDC_BUTTON_RANL                 1003
@@ -37,7 +39,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        143
+#define _APS_NEXT_RESOURCE_VALUE        146
 #define _APS_NEXT_COMMAND_VALUE         32772
 #define _APS_NEXT_CONTROL_VALUE         1025
 #define _APS_NEXT_SYMED_VALUE           101

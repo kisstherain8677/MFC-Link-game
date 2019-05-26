@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.572
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LLK", "LLK\LLK.vcxproj", "{D2580F6C-2070-4FD5-B091-EA93F3E2D02F}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup1", "Setup1\Setup1.vdproj", "{B7D1E535-3BFF-4E7F-BBCA-93671E544C0E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,10 @@ Global
 		{D2580F6C-2070-4FD5-B091-EA93F3E2D02F}.Release|x64.Build.0 = Release|x64
 		{D2580F6C-2070-4FD5-B091-EA93F3E2D02F}.Release|x86.ActiveCfg = Release|Win32
 		{D2580F6C-2070-4FD5-B091-EA93F3E2D02F}.Release|x86.Build.0 = Release|Win32
+		{B7D1E535-3BFF-4E7F-BBCA-93671E544C0E}.Debug|x64.ActiveCfg = Debug
+		{B7D1E535-3BFF-4E7F-BBCA-93671E544C0E}.Debug|x86.ActiveCfg = Debug
+		{B7D1E535-3BFF-4E7F-BBCA-93671E544C0E}.Release|x64.ActiveCfg = Release
+		{B7D1E535-3BFF-4E7F-BBCA-93671E544C0E}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
