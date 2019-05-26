@@ -8,12 +8,10 @@
 #define IDD_LLK_DIALOG                  102
 #define IDR_MAINFRAME                   128
 #define IDB_BITMAP1                     129
-#define IDB_MAIN_BG                     131
 #define IDD_GAME_DIALOG                 134
 #define IDD__DIALOG_HELP                138
 #define IDR_ACCELERATOR1                141
 #define IDB_BITMAP2                     143
-#define IDB_BITMAP3                     144
 #define IDC_BUTTON_BASIC                1000
 #define IDC_BUTTON_LEVEL                1002
 #define IDC_BUTTON_RANL                 1003

@@ -242,15 +242,22 @@ void CGameDlg::JudgeWin()
 void CGameDlg::InitElement() {
 	CClientDC dc(this);
 	
-	HANDLE bmp = ::LoadImage(NULL, _T("theme\\picture\\all_element.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);;
+	HANDLE bmp = ::LoadImage(NULL, _T("theme\\picture\\all_element.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 	
 	m_dcElement.CreateCompatibleDC(&dc);
 	m_dcElement.SelectObject(bmp);
 
-	HANDLE bmpMask = ::LoadImage(NULL, _T("theme\\picture\\all_element_mask_fix.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);;
+	HANDLE bmpMask = ::LoadImage(NULL, _T("theme\\picture\\all_element_mask_fix.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 
 	m_dcMask.CreateCompatibleDC(&dc);
 	m_dcMask.SelectObject(bmpMask);
+
+	
+	HANDLE bmpPause = ::LoadImage(NULL, _T("theme\\picture\\pause.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+	//创建与视频内存兼容的内存DC
+	m_dcPause.CreateCompatibleDC(&dc);
+	//将位图资源选入DC
+	m_dcPause.SelectObject(bmpPause);
 }
 
 
@@ -338,6 +345,7 @@ void CGameDlg::DrawTipFrame(int nRow,int nCol) {
 void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	
+	
 	if (m_bPlaying == false) {
 		return;
 	}
@@ -354,6 +362,7 @@ void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 	if (nRow > MAX_ROW-1 || nCol > MAX_COL-1) {
 		return CDialogEx::OnLButtonUp(nFlags, point);
 	}
+	
 
 	//如果是第一次选中，绘制矩形框
 	if (m_bFirstPoint) {
@@ -490,11 +499,26 @@ void CGameDlg::OnClickedButtonPause()
 	}
 	if (m_bPause == false) {
 		this->GetDlgItem(IDC_BUTTON_PAUSE)->SetWindowTextW(_T("继续"));
+
+		//获取当前对话框的视频内存
+		CClientDC dc(this);
+		//把当前图片存到cache
+		CBitmap bmpMem;
+		bmpMem.CreateCompatibleBitmap(&dc, 1366, 768);
+		m_dcCache.SelectObject(bmpMem);
+
+		dc.BitBlt(50, 50, 70*12, 70*8, &m_dcPause, 0, 0, SRCCOPY);
+
+		
 		m_bPause = true;
 		return;
 	}
 	if (m_bPause == true) {
 		this->GetDlgItem(IDC_BUTTON_PAUSE)->SetWindowTextW(_T("暂停"));
+		
+		UpdateMap();
+
+
 		m_bPause = false;
 		return;
 	}

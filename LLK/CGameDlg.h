@@ -28,6 +28,8 @@ protected:
 	CDC m_dcElement;//元素内存DC
 	CDC m_dcMask;//掩码内存DC
 	CDC m_dcBG;//背景DC
+	CDC m_dcPause;//暂停图片
+	CDC m_dcCache;//保存缓冲
 	CPoint m_ptGameTop;//元素初始位置
 	CSize m_sizeElement;//元素大小
 	bool m_bFirstPoint;//是否第一次选中

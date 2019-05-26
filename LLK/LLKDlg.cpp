@@ -62,14 +62,14 @@ CLLKDlg::CLLKDlg(CWnd* pParent /*=nullptr*/)
 
 void CLLKDlg::InitBackground()
 {
-	//加载位图
-	CBitmap bitmap;
-	bitmap.LoadBitmap(IDB_MAIN_BG);
+	HANDLE bmp = ::LoadImage(NULL, _T("res\\StartImage.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+
 	//创建兼容DC
 	CClientDC dc(this);
+
 	m_dcMem.CreateCompatibleDC(&dc);
 	//将位图选进DC
-	m_dcMem.SelectObject(&bitmap);
+	m_dcMem.SelectObject(bmp);
 }
 
 void CLLKDlg::DoDataExchange(CDataExchange* pDX)

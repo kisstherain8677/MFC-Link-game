@@ -57,6 +57,9 @@ bool CGameControl::Link(int avPath[MAX_VERTEX_NUM], int &nVertex)
 	if (m_graph.GetVertex(index1) != m_graph.GetVertex(index2)) {
 		return false;
 	}
+	if (m_graph.GetVertex(index1) == BLANK || m_graph.GetVertex(index2) == BLANK) {
+		return false;
+	}
 	CGameLogic gameLogic;
 	
 	if (!gameLogic.IsLink(m_graph, m_ptSelFirst, m_ptSelSec)){
