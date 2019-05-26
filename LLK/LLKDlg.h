@@ -3,7 +3,10 @@
 //
 
 #pragma once
-
+//音乐相关文件
+#include <Mmsystem.h>
+#include<conio.h>
+#pragma comment(lib,"Winmm.lib")
 
 // CLLKDlg 对话框
 class CLLKDlg : public CDialogEx
@@ -23,6 +26,10 @@ public:
 
 // 实现
 protected:
+
+	//声明播放音乐函数
+	//BOOL PlaySound(LPCSTR pszSound, HMODULE hmod, DWORD fdwSound);
+
 	CDC m_dcMem;//位图内存
 	HICON m_hIcon;
 

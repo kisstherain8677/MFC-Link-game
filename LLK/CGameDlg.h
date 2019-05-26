@@ -4,6 +4,9 @@
 #include "CBasicGame.h"
 #include "CEasyGame.h"
 
+//音乐相关文件
+#include <mmsystem.h>
+#pragma comment(lib,"Winmm.lib")
 // CGameDlg 对话框
 
 class CGameDlg : public CDialogEx
@@ -40,7 +43,8 @@ protected:
 	int m_nProp;//表示道具数量
 
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
-	void InitBackground();
+	void InitBackgroundBasic();
+	void InitBackgroundEasy();
 	void InitElement();
 	void UpdateMap();
 	void DrawTipFrame(int nRow, int nCol);//根据行号列号绘制矩形提示框

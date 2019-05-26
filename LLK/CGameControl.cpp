@@ -65,6 +65,7 @@ bool CGameControl::Link(int avPath[MAX_VERTEX_NUM], int &nVertex)
 	gameLogic.Clear(m_graph, m_ptSelFirst, m_ptSelSec);
 	//获取路径，以及路径中顶点的个数
 	nVertex = gameLogic.GetVexPath(avPath);
+
 	return true;
 }
 

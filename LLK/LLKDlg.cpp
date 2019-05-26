@@ -89,9 +89,10 @@ END_MESSAGE_MAP()
 
 // CLLKDlg 消息处理程序
 
+
 BOOL CLLKDlg::OnInitDialog()
 {
-	
+
 	CDialogEx::OnInitDialog();
 	
 	// 将“关于...”菜单项添加到系统菜单中。
@@ -122,6 +123,11 @@ BOOL CLLKDlg::OnInitDialog()
 	// TODO: 在此添加额外的初始化代码
 	//将CBitmap对象选入最新创建的设备描述表中
 	InitBackground();
+	//播放音乐
+	//PlaySound(TEXT("res\\main.wav"), NULL, SND_FILENAME | SND_ASYNC);
+	mciSendString(_T("open res\\main.wav alias main"), NULL, 0, NULL);
+	
+	mciSendString(_T("play main"),NULL,0,NULL);
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -186,6 +192,9 @@ HCURSOR CLLKDlg::OnQueryDragIcon()
 
 void CLLKDlg::OnClickedButtonBasic()
 {
+	mciSendString(_T("stop main"), NULL, 0, NULL);
+	mciSendString(_T("open res\\basic.wav alias basic"), NULL, 0, NULL);
+	mciSendString(_T("play basic"),NULL,0,NULL);
 	//隐藏当前窗口
 	//this->ShowWindow(SW_HIDE);
 	//创建游戏窗口并显示
@@ -198,6 +207,7 @@ void CLLKDlg::OnClickedButtonBasic()
 	dlg.DoModal();
 	//显示当前窗口
 	this->ShowWindow(SW_SHOW);
+	
 }
 
 
@@ -210,6 +220,10 @@ void CLLKDlg::OnBnClickedButtonHelp()
 
 void CLLKDlg::OnBnClickedButtonRelax()
 {
+
+	mciSendString(_T("stop main"), NULL, 0, NULL);
+	mciSendString(_T("open res\\relax.wav alias relax"),NULL,0,NULL);
+	mciSendString(_T("play relax"), NULL, 0, NULL);
 	CGameDlg dlg;
 	CEasyGame* easyControl = new CEasyGame();
 	Flag flag{ false,true,true,_T("休闲模式") };
@@ -219,4 +233,5 @@ void CLLKDlg::OnBnClickedButtonRelax()
 	dlg.DoModal();
 	//显示当前窗口
 	this->ShowWindow(SW_SHOW);
+	
 }

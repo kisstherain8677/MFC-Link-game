@@ -35,6 +35,10 @@ CGameDlg::CGameDlg(CWnd* pParent /*=nullptr*/)
 
 CGameDlg::~CGameDlg()
 {
+	mciSendString(_T("stop relax"), NULL, 0, NULL);
+	mciSendString(_T("close relax"), NULL, 0, NULL);
+	mciSendString(_T("stop basic"), NULL, 0, NULL);
+	mciSendString(_T("close basic"), NULL, 0, NULL);
 }
 
 void CGameDlg::DoDataExchange(CDataExchange* pDX)
@@ -43,7 +47,7 @@ void CGameDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_GAME_TIME, m_GameProgress);
 }
 
-void CGameDlg::InitBackground()
+void CGameDlg::InitBackgroundBasic()
 {
 
 	//获取当前对话框的视频内存
@@ -51,6 +55,27 @@ void CGameDlg::InitBackground()
     
 	//加载bmp图片资源
 	HANDLE bmp = ::LoadImage(NULL, _T("theme\\picture\\basic_bg.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+	//创建与视频内存兼容的内存DC
+	m_dcBG.CreateCompatibleDC(&dc);
+	//将位图资源选入DC
+	m_dcBG.SelectObject(bmp);
+
+	//初始化内存DC
+	m_dcMem.CreateCompatibleDC(&dc);
+	CBitmap bmpMem;
+	bmpMem.CreateCompatibleBitmap(&dc, 1366, 768);
+	m_dcMem.SelectObject(&bmpMem);
+	//绘制背景到内存DC。
+	m_dcMem.BitBlt(0, 0, 1366, 768, &m_dcBG, 0, 0, SRCCOPY);
+}
+void CGameDlg::InitBackgroundEasy()
+{
+
+	//获取当前对话框的视频内存
+	CClientDC dc(this);
+
+	//加载bmp图片资源
+	HANDLE bmp = ::LoadImage(NULL, _T("theme\\picture\\relax_bg.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 	//创建与视频内存兼容的内存DC
 	m_dcBG.CreateCompatibleDC(&dc);
 	//将位图资源选入DC
@@ -88,13 +113,21 @@ BOOL CGameDlg::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	// TODO:  在此添加额外的初始化
-	//载入背景到内存
-	InitBackground();
+	m_flag = m_pGameControl->GetFlag();
+	//根据选择复制不同背景
+	if (m_flag.bTimer == false) {
+		InitBackgroundEasy();
+	}
+	else {
+		//载入背景到内存
+		InitBackgroundBasic();
+		
+	}
 	//载入元素图片到内存
 	InitElement();
 
 	this->GetDlgItem(IDC_BUTTON_HELP)->EnableWindow(TRUE);
-	m_flag = m_pGameControl->GetFlag();
+	
 	if (m_flag.bProp == false) {
 		this->GetDlgItem(IDC_BUTTON_TOOL)->ShowWindow(SW_HIDE);
 	}
@@ -214,7 +247,7 @@ void CGameDlg::InitElement() {
 	m_dcElement.CreateCompatibleDC(&dc);
 	m_dcElement.SelectObject(bmp);
 
-	HANDLE bmpMask = ::LoadImage(NULL, _T("theme\\picture\\all_element_mask.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);;
+	HANDLE bmpMask = ::LoadImage(NULL, _T("theme\\picture\\all_element_mask_fix.bmp"), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);;
 
 	m_dcMask.CreateCompatibleDC(&dc);
 	m_dcMask.SelectObject(bmpMask);
@@ -245,6 +278,16 @@ void CGameDlg::OnClickedButtonStart()
 	UpdateMap();
 	//更新窗口
 	InvalidateRect(m_rtGameRect,FALSE);
+	//显示提示
+	if (m_flag.bProp == true) {
+		//显示提示
+		MessageBox(_T("欢迎来到休闲模式!\n每消一对获取10分。用一次提示扣20分，用一次重排扣50分。每100分可以获得一个道具."));
+	}
+	if (m_flag.bProp == false) {
+		//显示提示
+		MessageBox(_T("欢迎来到基本模式!\n在进度条耗完前全部消除即可获得胜利!"));
+	}
+	
 }
 
 void CGameDlg::UpdateMap() {
@@ -302,8 +345,6 @@ void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 		return;
 	}
 	
-	
-	
 	if (point.x < m_ptGameTop.x || point.y < m_ptGameTop.y) {
 		return CDialogEx::OnLButtonUp(nFlags, point);
 	}
@@ -329,6 +370,10 @@ void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 		//连子判断
 		if (m_bProp) {//如果使用道具，调用直接消除方法
 			m_pGameControl->PropLink();
+			//播放音效
+			mciSendString(_T("open res\\disappear.wav alias dis"), NULL, 0, NULL);
+			mciSendString(_T("play dis"), NULL, 0, NULL);
+			
 			//加10分
 			int grade = m_pGameControl->GetGrade();
 			grade += 10;
@@ -342,12 +387,16 @@ void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 			return;
 		}
 		if (m_pGameControl->Link(avPath,VertexNum)) {
+			
 			//画线
 			DrawTipLine(avPath,VertexNum);
 			
 			Sleep(200);
 			//更新地图
 			UpdateMap();
+			//mciSendString(_T("open res\\ro6.wav alias dis"), NULL, 0, NULL);
+			//mciSendString(_T("play dis"), NULL, 0, NULL);
+			PlaySound(L"res\\ro6.wav", NULL, SND_FILENAME | SND_SYNC);
 			//加分
 			int grade = m_pGameControl->GetGrade();
 			grade += 10;
@@ -358,8 +407,9 @@ void CGameDlg::OnLButtonUp(UINT nFlags, CPoint point)
 			this->CaculateGrade();
 			DrawGrade();
 			DrawTool();
+			
 		}
-		//判断是否是相同图片
+	
 		
 		InvalidateRect(m_rtGameRect, FALSE);
 		//判断是否胜利
