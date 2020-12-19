@@ -1,4 +1,4 @@
-# Llk
+# Monster Linker
 A little MFC game from a fan of Monster Hunter^^ 
 
 These are demo pictures
